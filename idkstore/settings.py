@@ -20,7 +20,7 @@ DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['.onrender.com']
 CFRS_TRUSTED_ORIGINS = [
-    'https://idkstore.onrender.com',
+    'https://idk-store.onrender.com',
     'https://*.onrender.com',
 ]
 
