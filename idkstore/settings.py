@@ -18,8 +18,13 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-)f$skm43fj@+5d%pb0*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['idk-store.onrender.com']
-CFRS_TRUSTED_ORIGINS = [
+ALLOWED_HOSTS = [
+    "idk-store.onrender.com",
+    "localhost",   # Optional, for local development
+    "127.0.0.1",   # Optional, for local development
+]
+
+CSRF_TRUSTED_ORIGINS = [
     'https://idk-store.onrender.com',
     'https://*.onrender.com',
 ]
