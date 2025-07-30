@@ -1,0 +1,216 @@
+{% extends 'store/base.html' %}
+
+{% block title %}{{ product.name }} - E-commerce App{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-details-container {
+    margin: 2rem auto;
+    max-width: 900px;
+}
+.product-card-details {
+    
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    border: 1px solid #e1e1e1;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    background: #fff;
+    overflow: hidden;
+}
+.product-image-area {
+    flex: 1 1 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    min-height: 420px;
+    max-width: 420px;
+    max-height: fit-content;
+
+}
+.product-image-area img {
+    width: 100%;
+    max-width: 400px;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.product-details {
+    flex: 2 1 400px;
+    padding: 32px 36px;
+    text-align: left;
+}
+.product-name {
+    font-size: 2.2rem;
+    margin: 0 0 0.3rem 0;
+    letter-spacing: -1px;
+    font-weight: 700;
+}
+.product-price {
+    font-size: 1.7rem;
+    color: #28a745;
+    margin: 0.3rem 0 1rem 0;
+    font-weight: 600;
+}
+.product-category,
+.product-quantity {
+    font-size: 1.11rem;
+    color: #6c757d;
+    margin: 0.3rem 0;
+}
+.product-quantity span {
+    font-weight: 500;
+}
+.product-description {
+    margin: 1.3rem 0 2rem 0;
+    font-size: 1.13rem;
+    color: #333;
+}
+.btn {
+    padding: 10px 26px;
+    border-radius: 50px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.24s, box-shadow 0.24s;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.btn:hover {
+    background-color: #0056b3;
+}
+.btn-secondary {
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 1px solid #e2e6ea;
+}
+.btn-secondary:hover {
+    background-color: #e2e6ea;
+    color: #0056b3;
+}
+.btn-success {
+    background-color: #28a745;
+    color: #fff;
+}
+.btn-success:hover {
+    background-color: #218838;
+}
+.btn-outline-danger {
+    background-color: transparent;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+.add-to-cart-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+}
+.add-to-cart-form input[type="number"] {
+    width: 80px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 50px;
+    font-size: 1rem;
+    color: #495057;
+    background-color: #f8f9fa;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.add-to-cart-form input[type="number"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0,123,255,0.2);
+    outline: none;
+}
+.add-to-cart-form label {
+    font-size: 1rem;
+    color: #495057;
+}
+@media (max-width: 900px) {
+    .product-card { flex-direction: column; }
+    .product-details { padding: 24px 14px; width: 100%; }
+    .product-image-area { max-width: none; min-width: 0; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-details-container">
+    <div class="product-card-details">
+        <div class="product-image-area">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div style="width: 100%; height: 400px; display: flex; align-items: center; justify-content: center; color: #6c757d; background: #f8f9fa; border-radius: 12px;">
+                    <h3>No Image Available</h3>
+                </div>
+            {% endif %}
+        </div>
+        <div class="product-details">
+            <h1 class="product-name">{{ product.name }}</h1>
+            <div class="product-price">${{ product.price }}</div>
+            <div class="product-category">
+                <strong>Category:</strong> {{ product.category.name|default:"Unspecified" }}
+            </div>
+            <div class="product-quantity">
+                <strong>Available:</strong> {{ product.quantity }}
+                {% if product.quantity == 0 %}
+                    <span style="color: red;">Out of Stock</span>
+                {% elif product.quantity < 5 %}
+                    <span style="color: orange;">Low Stock</span>
+                {% else %}
+                    <span style="color: green;">In Stock</span>
+                {% endif %}
+            </div>
+            {% if product.description %}
+                <div class="product-description">
+                    <h3>Description</h3>
+                    <p>{{ product.description }}</p>
+                </div>
+            {% endif %}
+            <div style="margin-top: 1.7rem;">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+                    {% if user.is_authenticated %}
+                        {% if product.quantity > 0 %}
+                            <form method="post" action="{% url 'cart:add_to_cart' product.id %}" class="add-to-cart-form">
+                                {% csrf_token %}
+                                <label for="quantity">Quantity:</label>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.quantity }}">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-cart-plus"></i> Cart
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'cart:add_to_wishlist' product.id %}" class="add-to-wishlist-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="fas fa-heart"></i> Wishlist
+                                </button>
+                            </form>
+                        {% else %}
+                            <p class="text-danger" style="margin-bottom: 0;"><strong>Out of Stock</strong></p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-info" style="margin-bottom: 0;">
+                            <a class="btn btn-primary" href="{% url 'accounts:login' %}">Login</a> to add items to cart or wishlist.
+                        </p>
+                    {% endif %}
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

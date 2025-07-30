@@ -1,0 +1,363 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmation - MyEcommerce{% endblock %}
+
+{% block extra_css %}
+<style>
+.success-container {
+    max-width: 770px;
+    margin: 0 auto;
+    padding: 40px 18px 50px 18px;
+    text-align: center;
+}
+.success-icon {
+    font-size: 4.2rem;
+    color: #19bc53;
+    margin-bottom: 18px;
+}
+.success-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #19bc53;
+    margin-bottom: 7px;
+}
+.success-subtitle {
+    font-size: 1.1rem;
+    color: #5a5a5a;
+    margin-bottom: 33px;
+}
+
+.order-info {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(24,32,54,0.10);
+    padding: 30px 24px;
+    margin: 35px 0 0 0;
+    text-align: left;
+}
+.order-header {
+    border-bottom: 2px solid #19bc53;
+    padding-bottom: 14px;
+    margin-bottom: 19px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+.order-id {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #222;
+}
+.order-date {
+    color: #666;
+    font-size: .99rem;
+}
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 22px;
+}
+.info-card {
+    background: #f7f8fa;
+    border-radius: 7px;
+    padding: 18px 16px;
+}
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 3px 0;
+}
+.info-label {
+    font-weight: 500;
+    color: #333;
+    font-size: .97rem;
+}
+.info-value {
+    color: #5b5b5b;
+    font-size: .97rem;
+    text-align: right;
+    word-break: break-word;
+}
+.tracking-info {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 14px 20px;
+    margin: 22px 0 28px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 1rem;
+}
+.status-badge {
+    display: inline-block;
+    padding: 4px 13px;
+    border-radius: 4px;
+    font-size: .99rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    margin-left: 6px;
+}
+.status-pending { background-color: #fff3cd; color: #856404; }
+.status-confirmed { background-color: #d4edda; color: #155724; }
+.status-processing { background-color: #cce5ff; color: #004085; }
+.status-shipped { background-color: #e2e3e5; color: #383d41; }
+.status-delivered { background-color: #d1ecf1; color: #0c5460; }
+
+.order-items {
+    margin: 20px 0 0 0;
+}
+.item {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    padding: 15px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+.item:last-child { border-bottom: none; }
+.item-image {
+    width: 58px;
+    height: 58px;
+    object-fit: cover;
+    border-radius: 5px;
+    background: #f5f6fa;
+    border: 1px solid #efeff2;
+}
+.item-details { flex: 1; min-width: 0; }
+.item-name {
+    font-weight: 600;
+    margin-bottom: 3px;
+    font-size: 1.06rem;
+    color: #273046;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.item-info { color: #7c7c7c; font-size: .97rem; }
+.item-total { font-weight: bold; color: #19bc53; min-width: 70px; text-align: right; }
+
+.total-section {
+    background: #f8f9fa;
+    border-radius: 5px;
+    padding: 19px 18px 10px 18px;
+    margin-top: 23px;
+}
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 1.05rem;
+}
+.total-row.grand-total {
+    border-top: 2px solid #19bc53;
+    padding-top: 10px;
+    font-size: 1.22rem;
+    font-weight: bold;
+    margin-top: 15px;
+    color: #222;
+}
+
+.order-notes {
+    margin-top: 26px;
+    background: #f7f7fb;
+    border-radius: 5px;
+    padding: 12px 15px;
+    color: #666;
+    font-size: .99rem;
+}
+
+.action-buttons {
+    margin-top: 38px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+}
+.btn {
+    padding: 11px 29px;
+    border: none;
+    border-radius: 5px;
+    font-size: 17px;
+    text-decoration: none;
+    display: inline-block;
+    margin: 0 5px 5px 0;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border-radius: 50px;
+}
+.btn-primary:hover { background-color: #0056b3; color: white; }
+.btn-success {
+    background-color: #19bc53;
+    color: white;
+    border-radius: 50px;
+}
+.btn-success:hover { background-color: #148d3c; color: white; }
+.btn-outline-primary {
+    border: 2px solid #007bff;
+    color: #007bff;
+    background: transparent;
+    border-radius: 50px;
+}
+.btn-outline-primary:hover { background-color: #007bff; color: white; }
+.help-section {
+    margin-top: 32px;
+    text-align: center;
+}
+.help-section p {
+    color: #7b8697;
+    font-size: 1.04rem;
+}
+.help-section a {
+    color: #2196f3;
+    text-decoration: underline;
+}
+@media (max-width: 900px) {
+    .order-info { padding: 17px 5vw; }
+    .info-grid { grid-template-columns: 1fr; }
+    .action-buttons { flex-direction: column; gap: 10px; }
+}
+@media (max-width: 600px) {
+    .success-container { padding: 13px 2vw 30px 2vw; }
+    .order-info { padding: 11px 1vw; }
+    .order-header { flex-direction: column; align-items: flex-start; gap: 8px;}
+    .item { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .item-image { margin-bottom: 6px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    <div class="success-title">Order Confirmed!</div>
+    <div class="success-subtitle">Thank you for your purchase. Your order has been successfully placed.</div>
+
+    <div class="order-info">
+        <div class="order-header">
+            <div class="order-id">Order #{{ order.order_id }}</div>
+           
+        </div>
+         <div class="order-date">Placed on {{ order.created_at|date:"F d, Y" }} at {{ order.created_at|time:"g:i A" }}</div>
+        <div class="info-grid">
+            <div class="info-card">
+                <div style="font-weight:600;font-size:1.08rem;margin-bottom:8px;color:#222;">Billing Information</div>
+                <div class="info-row">
+                    <span class="info-label">Name:</span>
+                    <span class="info-value">{{ order.first_name }} {{ order.last_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ order.email }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Phone:</span>
+                    <span class="info-value">{{ order.phone }}</span>
+                </div>
+            </div>
+            <div class="info-card">
+                <div style="font-weight:600;font-size:1.08rem;margin-bottom:8px;color:#222;">Shipping Information</div>
+                <div class="info-row">
+                    <span class="info-label">Address:</span>
+                    <span class="info-value">
+                        {{ order.shipping_address }}
+                        <br>
+                        {{ order.shipping_city }}, {{ order.shipping_state }}, {{ order.shipping_postal_code }}<br>
+                        {{ order.shipping_country }}
+                    </span>
+                </div>
+                {% if order.shipping_phone %}
+                <div class="info-row">
+                    <span class="info-label">Phone:</span>
+                    <span class="info-value">{{ order.shipping_phone }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="tracking-info">
+            <b>Order Status:</b>
+            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+            &nbsp;|&nbsp;
+            <b>Payment:</b>
+            {{ order.payment.get_payment_method_display }} -
+            {{ order.payment.get_status_display }}
+        </div>
+
+        <h4 style="margin-top:24px;font-size:1.18rem;">Order Items</h4>
+        <div class="order-items">
+            {% for item in order.order_items.all %}
+            <div class="item">
+                {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-image">
+                {% else %}
+                <div class="item-image bg-light d-flex align-items-center justify-content-center">
+                    <i class="fas fa-image text-muted"></i>
+                </div>
+                {% endif %}
+                <div class="item-details">
+                    <div class="item-name">{{ item.product.name }}</div>
+                    <div class="item-info">Quantity: {{ item.quantity }} × ${{ item.price }}</div>
+                </div>
+                <div class="item-total">${{ item.total_price }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="total-section">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span>${{ order.total_amount }}</span>
+            </div>
+            {% if order.shipping_cost > 0 %}
+            <div class="total-row">
+                <span>Shipping:</span>
+                <span>${{ order.shipping_cost }}</span>
+            </div>
+            {% endif %}
+            {% if order.coupon_usage %}
+            <div class="total-row">
+                <span>Discount ({{ order.coupon_usage.coupon.code }}):</span>
+                <span class="text-success">-${{ order.coupon_usage.discount_amount }}</span>
+            </div>
+            {% endif %}
+            {% if order.tax_amount > 0 %}
+            <div class="total-row">
+                <span>Tax:</span>
+                <span>${{ order.tax_amount }}</span>
+            </div>
+            {% endif %}
+            <div class="total-row grand-total">
+                <span>Total:</span>
+                <span>${{ order.grand_total }}</span>
+            </div>
+        </div>
+        {% if order.order_notes %}
+        <div class="order-notes">
+            <strong>Order Notes:</strong>
+            <div>{{ order.order_notes }}</div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="action-buttons">
+        <a href="{% url 'payment:order_detail' order.order_id %}" class="btn btn-primary">
+            <i class="fas fa-eye me-2"></i> View Order Details
+        </a>
+        <a href="{% url 'payment:order_tracking' order.order_id %}" class="btn btn-outline-primary">
+            <i class="fas fa-truck me-2"></i> Track Order
+        </a>
+        <a href="{% url 'store:home' %}" class="btn btn-success">
+            <i class="fas fa-shopping-bag me-2"></i> Continue Shopping
+        </a>
+    </div>
+    <div class="help-section">
+        <p>
+            <i class="fas fa-question-circle me-2"></i>
+            Need help? <a href="https://t.me/chamroeun_exe" target="_blank" rel="noopener noreferrer" class="text-primary">Contact our support team</a>
+
+        </p>
+    </div>
+</div>
+{% endblock %}

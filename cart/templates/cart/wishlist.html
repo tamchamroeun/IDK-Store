@@ -1,0 +1,340 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Wishlist{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cart/css/cart.css' %}">
+<style>
+body { background: #f3f3fd; }
+.wishlist-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    background: linear-gradient(90deg, #7b2ff2 30%, #f357a8 100%);
+    padding: 30px 30px 22px 30px;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 6px 24px 0 rgba(103, 65, 217, 0.10);
+}
+.wishlist-header h2 {
+    font-weight: 800;
+    font-size: 2.2rem;
+    margin: 0;
+    color: #232b3b;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #232b3b 80%, #7b2ff2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.wishlist-header .fa-heart {
+    font-size: 2.3rem;
+    color: #232b3b;
+}
+.wishlist-count {
+    background: #ff5a5f;
+    color: #fff;
+    border-radius: 2em;
+    padding: 0.28em 1.4em;
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin-left: 10px;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.wishlist-table-container {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 32px 0 #7b2ff213;
+    padding-bottom: 20px;
+    max-width: 1050px;
+    margin: 30px auto 0 auto;
+    overflow-x: auto;
+}
+.wishlist-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5em;
+    margin: 0 auto;
+    min-width: 750px;
+}
+.wishlist-table th, .wishlist-table td {
+    text-align: left;
+    padding: 18px 12px;
+    background: #fff;
+}
+.wishlist-table th {
+    font-size: 1.10rem;
+    color: #232b3b;
+    font-weight: 700;
+    background: #f7f7fa;
+    border-top: none;
+    border-bottom: 2px solid #ececec;
+    letter-spacing: 0.7px;
+}
+.wishlist-table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #efefef;
+    font-size: 1.04rem;
+}
+.wishlist-image {
+    width: 66px;
+    height: 66px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #f4f4fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.wishlist-image .fa-image {
+    font-size: 2.2rem;
+    color: #bdbdbd;
+}
+.wishlist-name {
+    font-weight: 700;
+    color: #232b3b;
+    font-size: 1.10rem;
+    max-width: 210px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+.wishlist-description {
+    color: #6a6a88;
+    font-size: 0.96rem;
+    margin-bottom: 0;
+    margin-top: 2px;
+    max-width: 210px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.wishlist-price {
+    font-weight: 600;
+    color: #232b3b;
+    font-size: 1.07rem;
+}
+.wishlist-stock {
+    color: #17b763;
+    font-size: 1.01rem;
+    font-weight: 500;
+}
+.wishlist-stock.out {
+    color: #ff5a5f;
+}
+.wishlist-row-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 160px;
+}
+.btn-wishlist-add {
+    background: linear-gradient(90deg,#4361ee 60%,#7b2ff2 100%);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 9px 20px 9px 20px;
+    font-weight: 700;
+    font-size: 1.04rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.16s;
+    box-shadow: 0 2px 8px 0 #7b2ff222;
+}
+.btn-wishlist-add:hover, .btn-wishlist-add:focus {
+    background: linear-gradient(90deg,#7b2ff2 60%,#4361ee 100%);
+}
+.btn-wishlist-remove {
+    background: #fff;
+    color: #ff5a5f;
+    border: 2px solid #ff5a5f;
+    border-radius: 50px;
+    padding: 9px 30px 9px 30px;
+    font-weight: 700;
+    font-size: 1.04rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.16s, color 0.16s;
+}
+.btn-wishlist-remove:hover, .btn-wishlist-remove:focus {
+    background: #ff5a5f;
+    color: #fff;
+}
+.btn-wishlist-disabled {
+    background: #f3f3fd;
+    color: #bdbdbd;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 0;
+    font-weight: 700;
+    font-size: 1.04rem;
+    cursor: not-allowed;
+}
+.wishlist-footer-btns {
+    width: 100%;
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin: 20px auto 0 auto;
+}
+.wishlist-footer-btn {
+    font-weight: 700;
+    font-size: 1.09rem;
+    border-radius: 50px;
+    padding: 10px 24px;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px 0 #7b2ff222;
+    cursor: pointer;
+    transition: background 0.17s, color 0.17s;
+}
+.btn-continue {
+    text-decoration: none;
+    background: none;
+    color: #7b2ff2;
+    border: 2px solid #7b2ff2;
+}
+.btn-continue:hover {
+    background: #ede7ff;
+}
+.btn-view-cart {
+    text-decoration: none;
+    background: linear-gradient(90deg, #7b2ff2 60%, #4361ee 100%);
+    color: #fff;
+    border: none;
+}
+.btn-view-cart:hover {
+    background: linear-gradient(90deg, #4361ee 60%, #7b2ff2 100%);
+}
+@media (max-width: 900px) {
+    .wishlist-table { min-width: 620px;}
+}
+@media (max-width: 600px) {
+    .wishlist-header { flex-direction: column; align-items: flex-start; gap: 7px; }
+    .wishlist-table-container { padding: 0 2px; }
+    .wishlist-table { min-width: 350px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wishlist-header">
+    <i class="fas fa-heart"></i>
+    <h2>My Wishlist</h2>
+    {% if wishlist.total_items > 0 %}
+        <span class="wishlist-count">{{ wishlist.total_items }} item{{ wishlist.total_items|pluralize }}</span>
+    {% endif %}
+</div>
+
+<div class="wishlist-table-container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="min-width:300px;">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if products %}
+        <table class="wishlist-table">
+            <thead>
+                <tr>
+                    <th style="width:90px;">IMAGE</th>
+                    <th style="width:250px;">PRODUCT</th>
+                    <th>PRICE</th>
+                    <th>STOCK</th>
+                    <th style="width:180px;">ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="wishlist-image">
+                        {% else %}
+                            <div class="wishlist-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="wishlist-name">{{ product.name }}</div>
+                        <div class="wishlist-description">{{ product.description|truncatewords:10 }}</div>
+                    </td>
+                    <td>
+                        <span class="wishlist-price">${{ product.price|floatformat:2 }}</span>
+                    </td>
+                    <td>
+                        {% if product.quantity > 0 %}
+                            <span class="wishlist-stock">{{ product.quantity }} in stock</span>
+                        {% else %}
+                            <span class="wishlist-stock out">Out of Stock</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="wishlist-row-actions">
+                            {% if product.quantity > 0 %}
+                            <form method="post" action="{% url 'cart:move_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-wishlist-add">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                            </form>
+                            {% else %}
+                                <button class="btn-wishlist-disabled" disabled>
+                                    Out of Stock
+                                </button>
+                            {% endif %}
+                            <form method="post" action="{% url 'cart:remove_from_wishlist' product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-wishlist-remove">
+                                    <i class="fas fa-heart-broken"></i> Remove
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="wishlist-footer-btns">
+            <a href="{% url 'store:home' %}" class="wishlist-footer-btn btn-continue">
+                <i class="fas fa-arrow-left"></i> Continue Shopping
+            </a>
+            <a href="{% url 'cart:cart_view' %}" class="wishlist-footer-btn btn-view-cart">
+                <i class="fas fa-shopping-cart"></i> View Cart
+            </a>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-heart-broken fa-5x text-muted mb-3"></i>
+            <h4>Your wishlist is empty</h4>
+            <p class="text-muted">Save products you love to your wishlist for easy access later.</p>
+            <a href="{% url 'store:home' %}" class="btn btn-primary">
+                <i class="fas fa-shopping-bag"></i> Start Shopping
+            </a>
+            <a href="{% url 'cart:cart_view' %}" class="btn btn-outline-primary ml-2">
+                <i class="fas fa-shopping-cart"></i> View Cart
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

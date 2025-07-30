@@ -1,0 +1,302 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cart/css/cart.css' %}">
+<style>
+/* Hide the up/down spinner arrows on number input fields for all browsers */
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.qty-input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.product-name{
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em;
+    font-weight: 700;
+    font-size: 1.13rem;
+    color: #232b3b;
+    margin-bottom: 2px;
+    margin-right: 2px;
+    margin-top: 2px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #0078f1;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 12px 12px 0 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <!-- Header Section -->
+    <div class="cart-header">
+        <div class="cart-title">
+            <h1><i class="fas fa-shopping-cart"></i> Shopping Cart</h1>
+            {% if cart.total_items > 0 %}
+                <span class="item-count">{{ cart.total_items }} item{{ cart.total_items|pluralize }}</span>
+            {% endif %}
+        </div>
+        
+        {% if cart_items %}
+            <div class="cart-actions">
+                <form method="post" action="{% url 'cart:clear_cart' %}" class="clear-cart-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-clear" onclick="return confirm('Clear all items from cart?')">
+                        <i class="fas fa-trash-alt"></i> Clear Cart
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message message-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="message-close" onclick="this.parentElement.remove()">×</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if cart_items %}
+        <div class="cart-content">
+            <!-- Cart Items List -->
+            <div class="cart-items">
+                <div class="items-header">
+                    <span class="header-product">Product</span>
+                    <span class="header-price">Price</span>
+                    <span class="header-quantity">Quantity</span>
+                    <span class="header-total">Total</span>
+                    <span class="header-action"></span>
+                </div>
+                
+                <div class="items-list">
+                    {% for item in cart_items %}
+                        <div class="cart-item" data-item-id="{{ item.id }}">
+                            <div class="item-product" style="display: flex; align-items: center; width: 255px;">
+                                <div class="product-image">
+                                    {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                    {% else %}
+                                        <div class="image-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="product-details">
+                                    <h3 class="product-name">{{ item.product.name }}</h3>
+                                    <p class="product-category">{{ item.product.category.name|default:"Uncategorized" }}</p>
+                                    <p class="product-stock">{{ item.product.quantity }} in stock</p>
+                                </div>
+                            </div>
+                            
+                            <div class="item-price">
+                                <span class="price">${{ item.product.price }}</span>
+                            </div>
+                            
+                            <div class="item-quantity">
+                                <div class="quantity-controls">
+                                    <button type="button" class="qty-btn minus" onclick="updateQuantity({{ item.id }}, -1, {{ item.product.quantity }})">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" 
+                                           name="quantity" 
+                                           value="{{ item.quantity }}" 
+                                           min="1" 
+                                           max="{{ item.product.quantity }}"
+                                           class="qty-input"
+                                           id="qty-{{ item.id }}"
+                                           data-item-id="{{ item.id }}"
+                                           onchange="updateQuantity({{ item.id }}, 0, {{ item.product.quantity }})"
+                                           autocomplete="off">
+                                    <button type="button" class="qty-btn plus" onclick="updateQuantity({{ item.id }}, 1, {{ item.product.quantity }})">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="item-total" style="padding-left: 12px;">
+                                <span class="total-price" id="item-total-{{ item.id }}">${{ item.total_price|floatformat:2 }}</span>
+                            </div>
+                            
+                            <div class="item-action">
+                                <form method="post" action="{% url 'cart:remove_from_cart' item.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="remove-btn" title="Remove item">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <div class="summary-card">
+                    <h3>Order Summary</h3>
+                    
+                    <div class="summary-row">
+                        <span>Subtotal (<span class="item-count">{{ cart.total_items }}</span> items)</span>
+                        <span class="cart-total-price">${{ total_price|floatformat:2 }}</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span class="free">Free</span>
+                    </div>
+                    
+                    <div class="summary-row estimated-tax">
+                        <span>Estimated Tax</span>
+                        <span class="tax-amount">${{ tax_amount|floatformat:2 }}</span>
+                    </div>
+                    
+                    <div class="summary-divider"></div>
+                    
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span class="total-with-tax">${{ total_with_tax|floatformat:2 }}</span>
+                    </div>
+                    
+                    <div class="checkout-btn">
+                        <a href="{% url 'payment:checkout' %}" class="checkout-link">
+                            <i class="fas fa-lock"></i> Proceed to Checkout
+                        </a>
+                    </div>
+                    
+                    <div class="continue-shopping">
+                        <a href="{% url 'store:home' %}" class="continue-btn">
+                            <i class="fas fa-arrow-left"></i> Continue Shopping
+                        </a>
+                    </div>
+                    
+                    <div class="wishlist-link">
+                        <a href="{% url 'cart:wishlist_view' %}">
+                            <i class="fas fa-heart"></i> View Wishlist
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty Cart State -->
+        <div class="empty-cart">
+            <div class="empty-cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <h2>Your cart is empty</h2>
+            <p>Looks like you haven't added anything to your cart yet.</p>
+            <div class="empty-cart-actions">
+                <a href="{% url 'store:home' %}" class="start-shopping-btn">
+                    <i class="fas fa-shopping-bag"></i> Start Shopping
+                </a>
+                <a href="{% url 'cart:wishlist_view' %}" class="wishlist-btn">
+                    <i class="fas fa-heart"></i> View Wishlist
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// Get CSRF token for AJAX
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function updateQuantity(itemId, change, maxQty) {
+    const input = document.getElementById('qty-' + itemId);
+    let currentValue = parseInt(input.value);
+    let newValue = (change === 0) ? currentValue : currentValue + change;
+
+    if (isNaN(newValue) || newValue < 1 || newValue > maxQty) return;
+
+    let previousValue = currentValue; // Store previous value (before change)
+
+    let formData = new FormData();
+    formData.append('quantity', newValue);
+
+    fetch("{% url 'cart:update_cart_item' 0 %}".replace("0", itemId), {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie('csrftoken'),
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+            input.value = newValue; // Only update the value if success!
+            document.getElementById('item-total-' + itemId).textContent = "$" + parseFloat(data.item_total).toFixed(2);
+            document.querySelector('.item-count').textContent = data.cart_total_items + " item" + (data.cart_total_items !== 1 ? "s" : "");
+            document.querySelector('.cart-total-price').textContent = "$" + parseFloat(data.cart_total_price).toFixed(2);
+            document.querySelector('.tax-amount').textContent = "$" + parseFloat(data.tax_amount).toFixed(2);
+            document.querySelector('.total-with-tax').textContent = "$" + parseFloat(data.total_with_tax).toFixed(2);
+        } else {
+            input.value = previousValue; // Revert to old value if error
+            alert(data.error || "Failed to update cart item.");
+        }
+    })
+    .catch(() => {
+        input.value = previousValue; // Revert on fetch error too
+        alert("Error updating cart.");
+    });
+}
+
+// Allow manual input change as well
+document.querySelectorAll('.qty-input').forEach(input => {
+    input.addEventListener('change', function() {
+        const itemId = this.dataset.itemId;
+        const maxQty = parseInt(this.max);
+        updateQuantity(itemId, 0, maxQty);
+    });
+});
+
+// Auto-hide messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const messages = document.querySelectorAll('.message');
+    messages.forEach(function(message) {
+        setTimeout(function() {
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 300);
+        }, 5000);
+    });
+});
+</script>
+{% endblock %}

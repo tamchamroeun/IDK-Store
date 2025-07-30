@@ -1,0 +1,188 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Add Product{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 500px;
+        margin: 40px auto 0 auto;
+        padding: 30px 28px 20px 28px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 6px 32px rgba(70,80,160,0.13);
+    }
+    .btn-primary {
+        min-width: 140px;
+        padding: 12px 20px;
+        background: linear-gradient(90deg, #1488fa, #38b6ff);
+        border: none;
+        border-radius: 50px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+        box-shadow: 0 4px 16px rgba(20,136,250,0.05);
+        letter-spacing: 1px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+    }
+    .btn-primary[disabled] {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    .btn-secondary {
+        margin-left: 10px;
+        padding: 12px 20px;
+        background: #f5f5f5;
+        color: #1488fa;
+        border: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover {
+        background: #e0eaff;
+        color: #0056b3;
+        text-decoration: none;
+    }
+    .spinner {
+        border: 3px solid #e3e6f0;
+        border-top: 3px solid #fff;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        animation: spin 0.8s linear infinite;
+        vertical-align: middle;
+    }
+    .form-control {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1.5px solid #d0e4ff;
+        border-radius: 8px;
+        background: #f5faff;
+        font-size: 17px;
+        color: #333;
+        margin-top: 6px;
+        margin-bottom: 0;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+    }
+
+    .form-control:focus {
+        border-color: #2196f3;
+        background: #fff;
+        box-shadow: 0 0 0 2px #90caf955;
+    }
+
+    .image-preview-container {
+        text-align: center;
+        margin-bottom: 18px;
+    }
+
+    #image-preview {
+        display: none;
+        max-width: 180px;
+        max-height: 180px;
+        margin-bottom: 8px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(70,80,160,0.08);
+        background: #f8f8fa;
+        object-fit: contain;
+        border: 1px solid #d0e4ff;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="form-container">
+    <form method="post" enctype="multipart/form-data" id="product-form" autocomplete="off">
+        <h1>Add New Product</h1>
+        {% csrf_token %}
+
+        {# Render all fields except the image field #}
+        {% for field in form %}
+            {% if field.name != 'image' %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error-list" style="color:#dc3545;font-size:14px;margin-top:7px;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="form-group">
+    {{ form.image.label_tag }}
+    {{ form.image }}
+    <div class="image-preview-container">
+        <img id="image-preview" src="#" alt="Image Preview"/>
+    </div>
+    {% if form.image.errors %}
+        <div class="error-list" style="color:#dc3545;font-size:14px;margin-top:7px;">{{ form.image.errors }}</div>
+    {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="product-btn">
+            <span id="product-btn-text">Add Product</span>
+            <span id="product-btn-spinner" class="spinner" style="display:none;"></span>
+        </button>
+        <a href="{% url 'store:home' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Image preview logic
+    const input = document.getElementById('id_image');
+    const preview = document.getElementById('image-preview');
+    if (input && preview) {
+        input.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "#";
+                preview.style.display = 'none';
+            }
+        });
+    }
+
+    // Button loading spinner
+    const form = document.getElementById('product-form');
+    const btn = document.getElementById('product-btn');
+    const btnText = document.getElementById('product-btn-text');
+    const btnSpinner = document.getElementById('product-btn-spinner');
+    if (form && btn && btnText && btnSpinner) {
+        form.addEventListener('submit', function() {
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'inline-block';
+        });
+    }
+});
+</script>
+{% endblock %}

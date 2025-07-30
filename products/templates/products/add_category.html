@@ -1,0 +1,123 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Add Category - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #4f2ed4 0%, #1ca7ec 100%);
+        min-height: 100vh;
+    }
+    .auth-container {
+        max-width: 425px;
+        margin: 60px auto 0 auto;
+        padding: 36px 32px 28px 32px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 8px 40px rgba(70,80,160,0.13);
+        animation: slideDown 0.4s;
+    }
+    .btn-primary {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(90deg, #1488fa, #38b6ff);
+        border: none;
+        border-radius: 50px;
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 12px;
+        box-shadow: 0 4px 16px rgba(20,136,250,0.05);
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        position: relative;
+    }
+    .btn-primary[disabled] {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    .spinner {
+        border: 3px solid #e3e6f0;
+        border-top: 3px solid #fff;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        animation: spin 0.8s linear infinite;
+        vertical-align: middle;
+    }
+    .form-control {
+    width: 100%;
+    padding: 13px 15px;
+    border: 1.5px solid #d0e4ff;
+    border-radius: 8px;
+    background: #f5faff;
+    font-size: 17px;
+    color: #333;
+    margin-top: 6px;
+    margin-bottom: 0;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+    }
+
+    .form-control:focus {
+        border-color: #2196f3;
+        background: #fff;
+        box-shadow: 0 0 0 2px #90caf955;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-header">
+        <h1>Add Category</h1>
+    </div>
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        
+    {% endif %}
+        <form method="post" id="category-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-primary" id="category-btn">
+                <span id="category-btn-text">Add Category</span>
+                <span id="category-btn-spinner" class="spinner" style="display:none;"></span>
+            </button>
+        </form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('category-form');
+    const btn = document.getElementById('category-btn');
+    const btnText = document.getElementById('category-btn-text');
+    const btnSpinner = document.getElementById('category-btn-spinner');
+    if (form && btn && btnText && btnSpinner) {
+        form.addEventListener('submit', function() {
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'inline-block';
+        });
+    }
+});
+</script>
+{% endblock %}

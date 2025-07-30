@@ -1,0 +1,385 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Products - E-commerce App{% endblock %}
+
+{% block content %}
+<div class="products-header">
+    <h1>Products</h1>
+    <div class="header-actions">
+        <button onclick="toggleView()" class="view-toggle-btn" id="viewToggleBtn" aria-label="Toggle products view">
+            <span id="viewIcon" aria-hidden="true">⊞</span>
+            <span id="viewText">Grid View</span>
+        </button>
+        <a href="{% url 'products:add_product' %}" class="btn btn-primary">Add New Product</a>
+    </div>
+</div>
+
+<div class="products-container" id="productsContainer">
+    {% for product in products %}
+        <div class="product-item">
+            <div class="product-image-container" tabindex="0" aria-label="Product image">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image" loading="lazy">
+                {% else %}
+                    <div class="no-image">No Image</div>
+                {% endif %}
+            </div>
+            <div class="product-details">
+                <div class="product-main-info">
+                    <h3 class="product-title" title="{{ product.name }}">{{ product.name }}</h3>
+                    <div class="product-category">
+                        <i class="fas fa-tags"></i>
+                        {{ product.category|default:"No category" }}
+                    </div>
+                    <div class="product-description">{{ product.description|truncatewords:15 }}</div>
+                </div>
+                <div class="product-meta">
+                    <div class="product-price">${{ product.price }}</div>
+                    <div class="product-quantity">
+                        Available: {{ product.quantity }}
+                        {% if product.quantity == 0 %}
+                            <span class="badge badge-danger">Out of Stock</span>
+                        {% elif product.quantity < 5 %}
+                            <span class="badge badge-warning">Low Stock</span>
+                        {% else %}
+                            <span class="badge badge-success">In Stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="product-actions">
+                <a href="{% url 'products:product_detail' product.id %}" class="btn btn-secondary btn-sm" title="View product"><i class="fas fa-eye"></i></a>
+                <a href="{% url 'products:edit_product' product.id %}" class="btn btn-warning btn-sm" title="Edit product"><i class="fas fa-edit"></i></a>
+                <a href="{% url 'products:delete_product' product.id %}" class="btn btn-danger btn-sm" title="Delete product"><i class="fas fa-trash"></i></a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="no-products">
+            <p>No products available.</p>
+            <a href="{% url 'products:add_product' %}" class="btn btn-primary">Add Your First Product</a>
+        </div>
+    {% endfor %}
+</div>
+
+<style>
+.products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.view-toggle-btn {
+    padding: 0.5rem 1.1rem;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    color: #222;
+}
+.view-toggle-btn:focus,
+.view-toggle-btn:hover {
+    background: #f2f4f8;
+    border-color: #b6b9be;
+    outline: none;
+}
+
+.products-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Product Card */
+.product-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: 1px solid #ececec;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+}
+.product-item:hover {
+    box-shadow: 0 6px 22px rgba(60,92,170,0.12);
+    transform: translateY(-2px) scale(1.013);
+}
+
+.product-image-container {
+    flex-shrink: 0;
+    width: 90px;
+    height: 90px;
+    margin-right: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    background: #f8f9fa;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.no-image {
+    width: 100%;
+    height: 100%;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #adb5bd;
+    font-size: .97rem;
+    border: 1px solid #dee2e6;
+}
+
+.product-details {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    min-width: 0;
+    gap: 2rem;
+}
+
+.product-main-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-title {
+    font-size: 1.18rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: #1e2126;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-category {
+    color: #7d8597;
+    font-size: 0.93rem;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.product-description {
+    color: #4f4f4f;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+    white-space: pre-line;
+}
+
+.product-meta {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 130px;
+}
+
+.product-price {
+    font-size: 1.22rem;
+    font-weight: 700;
+    color: #22784e;
+    margin-bottom: 0.3rem;
+}
+
+.product-quantity {
+    font-size: 0.98rem;
+    color: #444;
+}
+
+.badge {
+    display: inline-block;
+    padding: .18em .8em;
+    font-size: .85em;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-left: 0.5em;
+}
+.badge-danger { background: #fae3e3; color: #c82333; }
+.badge-warning { background: #fff6e3; color: #d39e00; }
+.badge-success { background: #e3fae3; color: #22784e; }
+
+.product-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-left: 1.25rem;
+    flex-shrink: 0;
+}
+.product-actions .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+.btn-sm {
+    padding: 0.39rem 0.7rem;
+    font-size: 0.89rem;
+    text-align: center;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    min-width: 36px;
+}
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+.btn-secondary:hover { background-color: #555a5e; }
+.btn-warning:hover { background-color: #e0a800; }
+.btn-danger:hover { background-color: #b71d2c; }
+
+.no-products {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.no-products p {
+    color: #6c757d;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+/* GRID VIEW - 3 columns */
+.products-container.grid-view {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.products-container.grid-view .product-item {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 1.2rem;
+    box-shadow: 0 1.5px 6px rgba(0,0,0,0.08);
+}
+
+.products-container.grid-view .product-image-container {
+    margin-right: 0;
+    margin-bottom: 1.2rem;
+    width: 160px;
+    height: 160px;
+    align-self: center;
+}
+
+.products-container.grid-view .product-details {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.products-container.grid-view .product-main-info {
+    margin-right: 0;
+    margin-bottom: 0.7rem;
+}
+
+.products-container.grid-view .product-meta {
+    text-align: center;
+    margin-bottom: 0.7rem;
+}
+
+.products-container.grid-view .product-actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-left: 0;
+}
+
+/* Responsive: 2 columns on md, 1 on xs */
+@media (max-width: 1100px) {
+    .products-container.grid-view {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 700px) {
+    .products-container.grid-view {
+        grid-template-columns: 1fr;
+    }
+    .product-item,
+    .products-container.grid-view .product-item {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem;
+        gap: 0.9rem;
+    }
+    .product-image-container,
+    .products-container.grid-view .product-image-container {
+        width: 100%;
+        height: 180px;
+        margin: 0 0 1rem 0;
+    }
+}
+</style>
+
+<script>
+let isGridView = false;
+
+// Toggle between grid and list
+function toggleView() {
+    const container = document.getElementById('productsContainer');
+    const icon = document.getElementById('viewIcon');
+    const text = document.getElementById('viewText');
+    isGridView = !isGridView;
+    if (isGridView) {
+        container.classList.add('grid-view');
+        icon.textContent = '☰';
+        text.textContent = 'List View';
+    } else {
+        container.classList.remove('grid-view');
+        icon.textContent = '⊞';
+        text.textContent = 'Grid View';
+    }
+    localStorage.setItem('productViewPreference', isGridView ? 'grid' : 'list');
+}
+
+// Load saved preference
+document.addEventListener('DOMContentLoaded', function() {
+    const savedView = localStorage.getItem('productViewPreference');
+    if (savedView === 'grid') {
+        toggleView();
+    }
+});
+</script>
+{% endblock %}

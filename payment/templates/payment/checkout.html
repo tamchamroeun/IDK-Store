@@ -1,0 +1,590 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Checkout - MyEcommerce{% endblock %}
+
+{% block extra_css %}
+<style>
+body { background: #f3f3fd; }
+.checkout-container {
+    max-width: 1200px;
+    margin: 32px auto 0 auto;
+    padding: 0 8px 60px 8px;
+}
+@media (max-width: 900px) {
+    .checkout-container { padding: 0 2vw 30px 2vw; }
+}
+.checkout-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+.checkout-main, .checkout-summary-col {
+    flex: 1 1 320px;
+    min-width: 340px;
+}
+.checkout-summary-col {
+    max-width: 360px;
+}
+@media (max-width: 900px) {
+    .checkout-grid { flex-direction: column; gap: 24px; }
+    .checkout-main, .checkout-summary-col { min-width: 0; max-width: 100%; }
+}
+.checkout-section {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px 0 #7b2ff215;
+    margin-bottom: 24px;
+    padding: 28px 22px 22px 22px;
+}
+.section-title {
+    font-size: 1.33rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #232b3b;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 8px;
+    letter-spacing: 0.7px;
+}
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.form-col { flex: 1; }
+@media (max-width: 600px) {
+    .form-row { flex-direction: column; gap: 0; }
+}
+.form-group { margin-bottom: 14px; }
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #232b3b;
+}
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #e3e3ee;
+    border-radius: 7px;
+    font-size: 1rem;
+    background: #fafbfc;
+    transition: border 0.18s;
+}
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px #007bff22;
+}
+.shipping-method {
+    border: 1.3px solid #e3e3ee;
+    border-radius: 7px;
+    padding: 17px 15px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border 0.18s, background 0.18s;
+    background: #fafbfc;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.shipping-method.selected {
+    border-color: #007bff;
+    background: #e3f2fd;
+}
+.shipping-method input[type="radio"] {
+    accent-color: #007bff;
+    margin-right: 12px;
+}
+.order-summary {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 24px 16px;
+    margin-bottom: 12px;
+}
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 9px;
+    padding: 3px 0;
+    font-size: 1.08rem;
+}
+.summary-total {
+    border-top: 2px solid #007bff;
+    padding-top: 10px;
+    font-weight: bold;
+    font-size: 1.22rem;
+    color: #007bff;
+    margin-top: 7px;
+}
+.coupon-section {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 7px;
+    padding: 15px 15px 7px 15px;
+    margin-bottom: 16px;
+}
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.23s;
+    margin: 0 2px;
+    box-shadow: 0 1px 5px #007bff10;
+}
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+.btn-success:hover {
+    background-color: #1e7e34;
+}
+.btn-use-saved {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 7px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.btn-use-saved:hover {
+    background: #218838;
+}
+.error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+}
+.order-item {
+    display: flex;
+    align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid #eee;
+}
+.order-item:last-child { border-bottom: none; }
+.item-image {
+    width: 54px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 7px;
+    margin-right: 12px;
+    background: #f5f6fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.item-image .fa-image { font-size: 1.7rem; color: #bdbdbd; }
+.item-details { flex: 1; }
+.item-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+    color: #333;
+}
+.item-price {
+    color: #666;
+    font-size: 14px;
+}
+.item-total {
+    font-weight: 600;
+    color: #007bff;
+    font-size: 1.1rem;
+}
+.save-info-group {
+    margin-top: 17px;
+    padding: 12px 17px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 500;
+    color: #495057;
+    cursor: pointer;
+}
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+.saved-info-section {
+    background: #e8f5e8;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    padding: 13px 14px;
+    margin-bottom: 17px;
+}
+.saved-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+.saved-info-header i {
+    color: #28a745;
+    margin-right: 6px;
+}
+.saved-info-header span {
+    font-weight: 600;
+    color: #155724;
+    flex: 1;
+}
+.saved-info-preview {
+    font-size: 14px;
+    color: #155724;
+    line-height: 1.4;
+}
+.saved-info-preview p { margin: 4px 0; }
+.saved-info-preview strong { color: #0f5132; }
+@media (max-width: 600px) {
+    .checkout-section { padding: 13px 7px 9px 7px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <h1 class="text-center mb-4">Checkout</h1>
+    <form method="post" id="checkout-form">
+        {% csrf_token %}
+        <div class="checkout-grid">
+            <!-- Main Form Column -->
+            <div class="checkout-main">
+                <!-- Billing Info -->
+                <div class="checkout-section">
+                    <h3 class="section-title">Billing Information</h3>
+                    {% if user.profile.billing_first_name %}
+                        <div class="saved-info-section">
+                            <div class="saved-info-header">
+                                <i class="fas fa-bookmark"></i>
+                                <span>Use Saved Billing Information</span>
+                                <button type="button" class="btn-use-saved" onclick="useSavedBilling()">Use Saved</button>
+                            </div>
+                            <div class="saved-info-preview">
+                                <p><strong>{{ user.profile.billing_first_name }} {{ user.profile.billing_last_name }}</strong></p>
+                                <p>{{ user.profile.billing_phone }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ checkout_form.first_name.id_for_label }}">First Name *</label>
+                                {{ checkout_form.first_name }}
+                                {% if checkout_form.first_name.errors %}
+                                    <div class="error-message">{{ checkout_form.first_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ checkout_form.last_name.id_for_label }}">Last Name *</label>
+                                {{ checkout_form.last_name }}
+                                {% if checkout_form.last_name.errors %}
+                                    <div class="error-message">{{ checkout_form.last_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ checkout_form.phone.id_for_label }}">Phone Number *</label>
+                                {{ checkout_form.phone }}
+                                {% if checkout_form.phone.errors %}
+                                    <div class="error-message">{{ checkout_form.phone.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group save-info-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="save_billing_info" id="save_billing_info">
+                            <i class="fas fa-bookmark"></i> Save this billing information for future orders
+                        </label>
+                    </div>
+                </div>
+                <!-- Shipping Info -->
+                <div class="checkout-section">
+                    <h3 class="section-title">Shipping Information</h3>
+                    {% if user.profile.shipping_address %}
+                        <div class="saved-info-section">
+                            <div class="saved-info-header">
+                                <i class="fas fa-bookmark"></i>
+                                <span>Use Saved Shipping Information</span>
+                                <button type="button" class="btn-use-saved" onclick="useSavedShipping()">Use Saved</button>
+                            </div>
+                            <div class="saved-info-preview">
+                                <p><strong>{{ user.profile.shipping_first_name }} {{ user.profile.shipping_last_name }}</strong></p>
+                                <p>{{ user.profile.shipping_address }}</p>
+                                <p>{{ user.profile.shipping_city }}, {{ user.profile.shipping_state }} {{ user.profile.shipping_postal_code }}</p>
+                                <p>{{ user.profile.shipping_country }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ checkout_form.shipping_first_name.id_for_label }}">First Name *</label>
+                                {{ checkout_form.shipping_first_name }}
+                                {% if checkout_form.shipping_first_name.errors %}
+                                    <div class="error-message">{{ checkout_form.shipping_first_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ checkout_form.shipping_last_name.id_for_label }}">Last Name *</label>
+                                {{ checkout_form.shipping_last_name }}
+                                {% if checkout_form.shipping_last_name.errors %}
+                                    <div class="error-message">{{ checkout_form.shipping_last_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ checkout_form.shipping_phone.id_for_label }}">Phone Number *</label>
+                        {{ checkout_form.shipping_phone }}
+                        {% if checkout_form.shipping_phone.errors %}
+                            <div class="error-message">{{ checkout_form.shipping_phone.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ checkout_form.shipping_address.id_for_label }}">Street Address *</label>
+                        {{ checkout_form.shipping_address }}
+                        {% if checkout_form.shipping_address.errors %}
+                            <div class="error-message">{{ checkout_form.shipping_address.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ checkout_form.shipping_city.id_for_label }}">City *</label>
+                                {{ checkout_form.shipping_city }}
+                                {% if checkout_form.shipping_city.errors %}
+                                    <div class="error-message">{{ checkout_form.shipping_city.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ checkout_form.shipping_state.id_for_label }}">State/Province *</label>
+                                {{ checkout_form.shipping_state }}
+                                {% if checkout_form.shipping_state.errors %}
+                                    <div class="error-message">{{ checkout_form.shipping_state.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ checkout_form.shipping_postal_code.id_for_label }}">Postal Code *</label>
+                                {{ checkout_form.shipping_postal_code }}
+                                {% if checkout_form.shipping_postal_code.errors %}
+                                    <div class="error-message">{{ checkout_form.shipping_postal_code.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ checkout_form.shipping_country.id_for_label }}">Country *</label>
+                                {{ checkout_form.shipping_country }}
+                                {% if checkout_form.shipping_country.errors %}
+                                    <div class="error-message">{{ checkout_form.shipping_country.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group save-info-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="save_shipping_info" id="save_shipping_info">
+                            <i class="fas fa-bookmark"></i> Save this shipping information for future orders
+                        </label>
+                    </div>
+                </div>
+                <!-- Shipping Method -->
+                <div class="checkout-section">
+                    <h3 class="section-title">Shipping Method</h3>
+                    {% for shipping_method in shipping_methods %}
+                    <div class="shipping-method" data-cost="{{ shipping_method.cost }}">
+                        <input type="radio"
+                               name="shipping_method"
+                               value="{{ shipping_method.id }}"
+                               id="shipping_{{ shipping_method.id }}"
+                               {% if forloop.first %}checked{% endif %}
+                               required>
+                        <label for="shipping_{{ shipping_method.id }}">
+                            <strong>{{ shipping_method.name }}</strong> - ${{ shipping_method.cost }}
+                            <br>
+                            <small class="text-muted">{{ shipping_method.description }} ({{ shipping_method.estimated_days }} days)</small>
+                        </label>
+                    </div>
+                    {% endfor %}
+                    {% if checkout_form.shipping_method.errors %}
+                        <div class="error-message">{{ checkout_form.shipping_method.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <!-- Payment Method -->
+                <div class="checkout-section">
+                    <h3 class="section-title">Payment Method</h3>
+                    <div class="form-group">
+                        <label for="{{ payment_form.payment_method.id_for_label }}" class="form-label">Select Payment Method:</label>
+                        {{ payment_form.payment_method }}
+                    </div>
+                    {% if payment_form.payment_method.errors %}
+                        <div class="error-message">{{ payment_form.payment_method.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <!-- Coupon Section -->
+                <div class="checkout-section">
+                    <h3 class="section-title">Discount Coupon</h3>
+                    <div class="coupon-section">
+                        <div class="form-group">
+                            <label class="form-label" for="{{ checkout_form.coupon_code.id_for_label }}">Coupon Code</label>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    {{ checkout_form.coupon_code }}
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-primary" id="apply-coupon-btn">Apply Coupon</button>
+                                </div>
+                            </div>
+                            {% if checkout_form.coupon_code.errors %}
+                                <div class="error-message">{{ checkout_form.coupon_code.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div id="coupon-message"></div>
+                    </div>
+                </div>
+                <!-- Order Notes -->
+                <div class="checkout-section">
+                    <h3 class="section-title">Order Notes (Optional)</h3>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ checkout_form.order_notes.id_for_label }}">Additional Notes</label>
+                        {{ checkout_form.order_notes }}
+                    </div>
+                </div>
+            </div>
+            <!-- Order Summary Column -->
+             <div class="checkout-summary-col">
+                <div class="checkout-section">
+                    <h3 class="section-title">Order Summary</h3>
+                    <div class="order-summary">
+                        <!-- ... your order items code ... -->
+                        <div class="summary-item">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">${{ cart.total_price }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Shipping:</span>
+                            <span id="shipping-cost">$0.00</span>
+                        </div>
+                        <div class="summary-item" id="discount-row" style="display: none;">
+                            <span>Discount:</span>
+                            <span id="discount-amount" class="text-success">-$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Tax:</span>
+                            <span id="tax-amount">$0.00</span>
+                        </div>
+                        <div class="summary-item summary-total">
+                            <span>Total:</span>
+                            <span id="grand-total">${{ cart.total_price }}</span>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 mt-3" id="place-order-btn">
+                            <i class="fas fa-lock"></i> Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const shippingMethods = document.querySelectorAll('.shipping-method');
+    const shippingRadios = document.querySelectorAll('.shipping-method input[type="radio"]');
+
+    function updateOrderTotals(shippingCost = null, discount = null) {
+        const subtotal = parseFloat('{{ cart.total_price }}');
+        let currentShipping = 0;
+        if (shippingCost !== null) {
+            currentShipping = shippingCost;
+        } else {
+            const shippingText = document.getElementById('shipping-cost').textContent.replace('$', '');
+            currentShipping = parseFloat(shippingText) || 0;
+        }
+        let currentDiscount = 0;
+        if (discount !== null) {
+            currentDiscount = discount;
+        } else {
+            const discountText = document.getElementById('discount-amount').textContent.replace('-$', '').replace('$', '');
+            currentDiscount = parseFloat(discountText) || 0;
+        }
+        if (shippingCost !== null) {
+            document.getElementById('shipping-cost').textContent = '$' + currentShipping.toFixed(2);
+        }
+        if (discount !== null) {
+            const discountElement = document.getElementById('discount-amount');
+            const discountRow = document.getElementById('discount-row');
+            discountElement.textContent = '-$' + currentDiscount.toFixed(2);
+            if (currentDiscount > 0) {
+                discountRow.style.display = 'flex';
+                discountRow.style.justifyContent = 'space-between';
+            } else {
+                discountRow.style.display = 'none';
+            }
+        }
+        const total = subtotal + currentShipping - currentDiscount;
+        document.getElementById('grand-total').textContent = '$' + total.toFixed(2);
+        // For debugging:
+        // console.log('Order totals updated:', {subtotal, currentShipping, currentDiscount, total});
+    }
+
+    // Listen for radio button changes!
+    shippingRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const methodDiv = this.closest('.shipping-method');
+            shippingMethods.forEach(m => m.classList.remove('selected'));
+            methodDiv.classList.add('selected');
+            const cost = parseFloat(methodDiv.dataset.cost) || 0;
+            updateOrderTotals(cost);
+        });
+    });
+
+    // Listen for clicks on the container (for the DIV)
+    shippingMethods.forEach(method => {
+        method.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'INPUT') {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                radio.dispatchEvent(new Event('change', {bubbles: true}));
+            }
+        });
+    });
+
+    // Set default selection on page load
+    const checkedRadio = document.querySelector('.shipping-method input[type="radio"]:checked');
+    if (checkedRadio) {
+        checkedRadio.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+});
+</script>
+{% endblock %}

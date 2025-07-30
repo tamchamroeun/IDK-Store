@@ -1,0 +1,262 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Login - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #4f2ed4 0%, #1ca7ec 100%);
+        min-height: 100vh;
+    }
+    .auth-container {
+        max-width: 425px;
+        margin: 60px auto 0 auto;
+        padding: 36px 32px 28px 32px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 8px 40px rgba(70,80,160,0.13);
+        animation: slideDown 0.4s;
+    }
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-30px);}
+        to { opacity: 1; transform: translateY(0);}
+    }
+    .auth-header {
+        text-align: center;
+        margin-bottom: 32px;
+        color: #1488fa;
+        font-weight: 700;
+        letter-spacing: 1px;
+        font-size: 2.1rem;
+        line-height: 1.1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        font-size: 1.13em;
+        font-weight: 600;
+        color: #222;
+        margin-bottom: 2px;
+        display: block;
+    }
+    .form-control {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1.5px solid #d0e4ff;
+        border-radius: 50px;
+        background: #f5faff;
+        font-size: 17px;
+        color: #333;
+        margin-top: 6px;
+        margin-bottom: 0;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+        font-family: inherit;
+    }
+    .form-control:focus {
+        border-color: #2196f3;
+        background: #fff;
+        box-shadow: 0 0 0 2px #90caf955;
+    }
+    .input-wrapper {
+        position: relative;
+        width: 100%;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 14px;
+        top: 53%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #90a4ae;
+        font-size: 20px;
+        background: none;
+        border: none;
+        outline: none;
+        padding: 0;
+        z-index: 2;
+        transition: color 0.18s;
+    }
+    .toggle-password:hover {
+        color: #2196f3;
+    }
+    .btn-primary {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(90deg, #1488fa, #38b6ff);
+        border: none;
+        border-radius: 50px;
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 12px;
+        box-shadow: 0 4px 16px rgba(20,136,250,0.05);
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        position: relative;
+    }
+    .btn-primary[disabled] {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    .btn-primary:hover:enabled {
+        background: linear-gradient(90deg, #0e72c7, #1496ee);
+        color: #fff;
+    }
+    .auth-links {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 18px;
+        border-top: 1px solid #f0f0f0;
+        color: #666;
+        font-size: 16px;
+    }
+    .auth-links a {
+        color: #1488fa;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 7px 20px;
+        border-radius: 22px;
+        background: #edf6ff;
+        margin-left: 8px;
+        transition: background 0.2s;
+        display: inline-block;
+    }
+    .auth-links a:hover {
+        background: #97cbff;
+        color: #0056b3;
+        text-decoration: none;
+    }
+    .forgot-password {
+        display: block;
+        text-align: right;
+        margin-top: 7px;
+        margin-bottom: 0;
+    }
+    .forgot-password a {
+        color: #2196f3;
+        font-size: 14px;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .forgot-password a:hover {
+        text-decoration: underline;
+    }
+    .error-list {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 7px;
+        margin-bottom: 0;
+    }
+    .alert {
+        margin-bottom: 18px;
+        padding: 10px 14px;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+    /* Spinner styles for button */
+    .spinner {
+        border: 3px solid #e3e6f0;
+        border-top: 3px solid #fff;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        animation: spin 0.8s linear infinite;
+        vertical-align: middle;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-header">
+        <i class="fas fa-sign-in-alt"></i>
+        Welcome Back
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <form method="post" autocomplete="on" id="login-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="error-list">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.password.id_for_label }}">Password</label>
+            <div class="input-wrapper">
+                {{ form.password }}
+                <button type="button" class="toggle-password" tabindex="-1" onclick="togglePassword(this)">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            {% if form.password.errors %}
+                <div class="error-list">{{ form.password.errors }}</div>
+            {% endif %}
+        </div>
+        {% if form.non_field_errors %}
+            <div class="error-list">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <button type="submit" class="btn-primary" id="login-btn">
+            <span id="login-btn-text">Login</span>
+            <span id="login-btn-spinner" class="spinner" style="display:none;"></span>
+        </button>
+    </form>
+    <div class="auth-links">
+        <span>Don't have an account?</span>
+        <a href="{% url 'accounts:register' %}">Register here</a>
+    </div>
+</div>
+<script>
+function togglePassword(btn) {
+    const input = btn.parentElement.querySelector('input[type="password"], input[type="text"]');
+    const icon = btn.querySelector('i');
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('login-form');
+    const btn = document.getElementById('login-btn');
+    const btnText = document.getElementById('login-btn-text');
+    const btnSpinner = document.getElementById('login-btn-spinner');
+    if (form && btn && btnText && btnSpinner) {
+        form.addEventListener('submit', function() {
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'inline-block';
+        });
+    }
+});
+</script>
+{% endblock %}
