@@ -19,6 +19,9 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-)f$skm43fj@+5d%pb0*
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['.onrender.com']
+SECURE_SSL_REDIRECT = os.getenv('DJANGO_SECURE_SSL_REDIRECT', 'False') == 'True'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Application definition
 INSTALLED_APPS = [
