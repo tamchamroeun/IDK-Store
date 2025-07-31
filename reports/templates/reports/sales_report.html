@@ -1,387 +1,370 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
-{% block title %}Sales Report - E-commerce App{% endblock %}
+{% block title %}Sales Report{% endblock %}
 
 {% block extra_css %}
 <style>
+    :root {
+        --main-green: #28a745;
+        --main-cyan: #20c997;
+        --main-blue: #007bff;
+        --main-blue-dark: #0056b3;
+        --main-red: #dc3545;
+        --main-info: #17a2b8;
+        --background: #f8fafc;
+        --background-white: #fff;
+        --card-radius: 1rem;
+        --card-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        --transition: all 0.23s cubic-bezier(.4,0,.2,1);
+    }
     .report-header {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: linear-gradient(135deg, var(--main-green) 0%, var(--main-cyan) 100%);
         color: white;
-        padding: 2rem;
-        border-radius: 8px;
+        padding: 2rem 1.2rem;
+        border-radius: var(--card-radius);
         margin-bottom: 2rem;
+        box-shadow: var(--card-shadow);
+        text-align: center;
     }
-    
+    .report-header h1 {
+        font-size: clamp(1.3rem, 5vw, 2rem);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .report-header p {
+        font-size: 1.08rem;
+        font-weight: 400;
+        margin-bottom: 0;
+    }
+
+    .report-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 0.5rem 2rem 0.5rem;
+    }
+
     .filter-form {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        background: var(--background-white);
+        padding: 1.25rem 1rem;
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
         margin-bottom: 2rem;
     }
-    
     .form-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 1rem;
         align-items: end;
+        width: 100%;
     }
-    
     .form-group {
         display: flex;
         flex-direction: column;
+        width: 100%;
     }
-    
     .form-group label {
         margin-bottom: 0.5rem;
         font-weight: 500;
         color: #333;
     }
-    
-    .form-control {
+    .form-control,
+    .form-group select,
+    .form-group input[type="date"] {
         padding: 0.5rem;
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 1rem;
+        width: 100%;
+        background: #f8f9fa;
     }
-    
     .btn {
         padding: 0.5rem 1.5rem;
         border: none;
-        border-radius: 4px;
-        background: #007bff;
+        border-radius: 5px;
+        background: var(--main-blue);
         color: white;
         cursor: pointer;
-        font-weight: 500;
-        transition: background 0.3s ease;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
     }
-    
-    .btn:hover {
-        background: #0056b3;
-    }
-    
+    .btn:hover, .btn:focus-visible { background: var(--main-blue-dark); }
+
     .report-summary {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         gap: 1rem;
         margin-bottom: 2rem;
+        width: 100%;
     }
-    
     .summary-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        background: var(--background-white);
+        padding: 1.25rem 1rem;
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 120px;
+        justify-content: center;
     }
-    
     .summary-card .value {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #007bff;
-        margin-bottom: 0.5rem;
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: var(--main-blue);
+        margin-bottom: 0.3rem;
+        letter-spacing: 0.5px;
     }
-    
     .summary-card .label {
         color: #666;
-        font-size: 0.9rem;
+        font-size: 0.97rem;
+        font-weight: 500;
+        opacity: 0.97;
     }
-    
+
     .report-section {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        background: var(--background-white);
+        padding: 1.15rem 0.8rem;
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
         margin-bottom: 2rem;
+        width: 100%;
+        overflow-x: auto;
     }
-    
     .section-title {
         color: #333;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.4rem;
+        font-weight: 700;
+        font-size: 1.10rem;
         border-bottom: 2px solid #f8f9fa;
+        letter-spacing: 0.5px;
     }
-    
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-    }
-    
-    .table th,
-    .table td {
-        padding: 0.75rem;
-        text-align: left;
-        border-bottom: 1px solid #dee2e6;
-    }
-    
-    .table th {
-        background: #f8f9fa;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .table tr:hover {
-        background: #f8f9fa;
-    }
-    
+
     .export-buttons {
         display: flex;
         gap: 0.5rem;
         margin-bottom: 1rem;
         flex-wrap: wrap;
     }
-    
     .btn-export {
-        padding: 0.5rem 1rem;
+        padding: 0.5rem 1.12rem;
         border: none;
-        border-radius: 4px;
+        border-radius: 6px;
         color: white;
         cursor: pointer;
-        font-size: 0.9rem;
+        font-size: 0.96rem;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
+        font-weight: 600;
+        background: #e9ecef;
+        outline: none;
+        transition: var(--transition);
     }
-    
-    .btn-csv { background: #28a745; }
-    .btn-json { background: #17a2b8; }
-    .btn-pdf { background: #dc3545; }
-    
-    .btn-export:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-    }
-    
+    .btn-csv { background: var(--main-green); }
+    .btn-json { background: var(--main-info);}
+    .btn-pdf { background: var(--main-red);}
+    .btn-export:hover, .btn-export:focus-visible { opacity: 0.91; transform: translateY(-2px); }
+
+    /* Order Status Breakdown */
     .status-breakdown {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
         gap: 1rem;
         margin-top: 1rem;
+        width: 100%;
     }
-    
     .status-item {
         text-align: center;
-        padding: 1rem;
+        padding: 0.7rem 0.3rem;
         background: #f8f9fa;
-        border-radius: 4px;
+        border-radius: 6px;
+        min-width: 90px;
     }
-    
     .status-item .count {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
     }
-    
     .status-item .status {
-        font-size: 0.9rem;
+        font-size: 0.92rem;
         color: #666;
     }
-    
-    @media (max-width: 768px) {
-        .form-row {
-            grid-template-columns: 1fr;
-        }
-        
-        .report-summary {
-            grid-template-columns: 1fr;
-        }
-        
-        .export-buttons {
-            flex-direction: column;
-        }
-        
-        .table {
-            font-size: 0.9rem;
-        }
+    .status-item .revenue {
+        font-size: 0.82rem;
+        color: #999;
+        margin-top: 0.2rem;
     }
-    .report-container {
-        min-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        font-size: 1rem;
+        min-width: 390px;
     }
+    .table th, .table td {
+        padding: 0.7rem 0.6rem;
+        text-align: left;
+        border-bottom: 1px solid #edeef2;
+        min-width: 90px;
+        vertical-align: middle;
+    }
+    .table th {
+        background: #f4f4fa;
+        font-weight: 700;
+        color: #495057;
+    }
+    .table tr:hover {
+        background: #f8f9fa;
+    }
+    .table td { font-size: 0.98rem; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+        .report-header { padding: 1.3rem 0.5rem; }
+        .report-summary { gap: 0.6rem;}
+        .summary-card { padding: 1rem 0.5rem;}
+        .report-section { padding: 0.8rem 0.2rem;}
+    }
+    @media (max-width: 600px) {
+        .report-header { padding: 1rem 0.3rem; }
+        .report-header h1 { font-size: 1.1rem; }
+        .report-summary { grid-template-columns: 1fr; }
+        .form-row { grid-template-columns: 1fr; }
+        .btn-group { flex-direction: column; gap: 0.5rem; }
+        .section-title { font-size: 1rem;}
+        .table th, .table td { padding: 0.5rem 0.2rem; font-size: 0.92rem;}
+        .status-breakdown { grid-template-columns: 1fr 1fr; }
+        .summary-card .value { font-size: 1.12rem;}
+    }
+    /* For overflow on tiny screens */
+    .report-section { overflow-x: auto; }
+    .table { min-width: 350px; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="report-container">
     <div class="report-header">
-    <h1><i class="fas fa-chart-line"></i> Sales Report</h1>
-    <p>Comprehensive sales analytics and performance metrics for your business.</p>
-</div>
+        <h1><i class="fas fa-chart-line"></i> Sales Report</h1>
+        <p>Comprehensive sales analytics and performance metrics for your business.</p>
+    </div>
 
-<!-- Filter Form -->
-<div class="filter-form">
-    <form method="get">
-        <div class="form-row">
-            <div class="form-group">
-                <label for="{{ form.report_type.id_for_label }}">Report Type:</label>
-                {{ form.report_type }}
+    <!-- Filter Form -->
+    <div class="filter-form">
+        <form method="get">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.report_type.id_for_label }}">Report Type:</label>
+                    {{ form.report_type }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.start_date.id_for_label }}">Start Date:</label>
+                    {{ form.start_date }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.end_date.id_for_label }}">End Date:</label>
+                    {{ form.end_date }}
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn">
+                        <i class="fas fa-search"></i> Generate Report
+                    </button>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="{{ form.start_date.id_for_label }}">Start Date:</label>
-                {{ form.start_date }}
-            </div>
-            <div class="form-group">
-                <label for="{{ form.end_date.id_for_label }}">End Date:</label>
-                {{ form.end_date }}
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn">
-                    <i class="fas fa-search"></i> Generate Report
-                </button>
-            </div>
+        </form>
+    </div>
+
+    {% if report_data %}
+    <!-- Report Summary -->
+    <div class="report-summary">
+        <div class="summary-card">
+            <div class="value">{{ report_data.total_orders }}</div>
+            <div class="label">Total Orders</div>
         </div>
-    </form>
-</div>
-
-{% if report_data %}
-<!-- Report Summary -->
-<div class="report-summary">
-    <div class="summary-card">
-        <div class="value">{{ report_data.total_orders }}</div>
-        <div class="label">Total Orders</div>
-    </div>
-    <div class="summary-card">
-        <div class="value">${{ report_data.total_revenue|floatformat:2 }}</div>
-        <div class="label">Revenue (Delivered Orders Only)</div>
-    </div>
-    <div class="summary-card">
-        <div class="value">${{ report_data.average_order_value|floatformat:2 }}</div>
-        <div class="label">Avg Order Value (Delivered)</div>
-    </div>
-    <div class="summary-card">
-        <div class="value">{{ report_data.total_items_sold }}</div>
-        <div class="label">Items Sold</div>
-    </div>
-</div>
-
-<!-- Export Options -->
-<div class="report-section">
-    <h2 class="section-title">Export Report</h2>
-    <div class="export-buttons">
-        <button class="btn-export btn-csv" onclick="exportReport('csv')">
-            <i class="fas fa-file-csv"></i> Export CSV
-        </button>
-        <button class="btn-export btn-json" onclick="exportReport('json')">
-            <i class="fas fa-file-code"></i> Export JSON
-        </button>
-        <button class="btn-export btn-pdf" onclick="exportReport('pdf')">
-            <i class="fas fa-file-pdf"></i> Export PDF
-        </button>
-    </div>
-</div>
-
-<!-- Order Status Breakdown -->
-<div class="report-section">
-    <h2 class="section-title">Order Status Breakdown</h2>
-    <div class="status-breakdown">
-        {% for status in report_data.status_breakdown %}
-        <div class="status-item">
-            <div class="count">{{ status.count }}</div>
-            <div class="status">{{ status.status|title }}</div>
-            <div style="font-size: 0.8rem; color: #999;">
-                ${{ status.revenue|floatformat:2 }}
-            </div>
+        <div class="summary-card">
+            <div class="value">${{ report_data.total_revenue|floatformat:2 }}</div>
+            <div class="label">Revenue (Delivered Orders Only)</div>
         </div>
-        {% endfor %}
+        <div class="summary-card">
+            <div class="value">${{ report_data.average_order_value|floatformat:2 }}</div>
+            <div class="label">Avg Order Value (Delivered)</div>
+        </div>
+        <div class="summary-card">
+            <div class="value">{{ report_data.total_items_sold }}</div>
+            <div class="label">Items Sold</div>
+        </div>
     </div>
-</div>
 
-<!-- Daily Sales Chart -->
-<div class="report-section">
-    <h2 class="section-title">Daily Sales Trend</h2>
-    {% if report_data.daily_sales %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Orders</th>
-                    <th>Revenue</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for day in report_data.daily_sales %}
-                <tr>
-                    <td>{{ day.day }}</td>
-                    <td>{{ day.orders_count }}</td>
-                    <td>${{ day.revenue|floatformat:2 }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No daily sales data available for the selected period.</p>
+    <!-- Export Options -->
+    <div class="report-section">
+        <h2 class="section-title">Export Report</h2>
+        <div class="export-buttons">
+            <a class="btn-export btn-csv" href="{% url 'reports:export_report' %}?format=csv&report_type={{ form.report_type.value }}&start_date={{ form.start_date.value }}&end_date={{ form.end_date.value }}">
+                <i class="fas fa-file-csv"></i> Export CSV
+            </a>
+            <a class="btn-export btn-json" href="{% url 'reports:export_report' %}?format=json&report_type={{ form.report_type.value }}&start_date={{ form.start_date.value }}&end_date={{ form.end_date.value }}">
+                <i class="fas fa-file-code"></i> Export JSON
+            </a>
+            <a class="btn-export btn-pdf" href="{% url 'reports:export_report' %}?format=pdf&report_type={{ form.report_type.value }}&start_date={{ form.start_date.value }}&end_date={{ form.end_date.value }}">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- Order Status Breakdown -->
+    <div class="report-section">
+        <h2 class="section-title">Order Status Breakdown</h2>
+        <div class="status-breakdown">
+            {% for status in report_data.status_breakdown %}
+            <div class="status-item">
+                <div class="count">{{ status.count }}</div>
+                <div class="status">{{ status.status|capfirst }}</div>
+                <div class="revenue">${{ status.revenue|floatformat:2 }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Daily Sales Chart -->
+    <div class="report-section">
+        <h2 class="section-title">Daily Sales Trend</h2>
+        {% if report_data.daily_sales %}
+            <div style="overflow-x:auto;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Orders</th>
+                        <th>Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for day in report_data.daily_sales %}
+                    <tr>
+                        <td>{{ day.day }}</td>
+                        <td>{{ day.orders_count }}</td>
+                        <td>${{ day.revenue|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% else %}
+            <p>No daily sales data available for the selected period.</p>
+        {% endif %}
+    </div>
     {% endif %}
 </div>
-</div>
-
-<script>
-// Get CSRF token from cookie (Django standard)
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-function exportReport(format) {
-    // Get data from the filter form (so export matches what user sees)
-    const form = document.querySelector('.filter-form form');
-    const reportType = form.querySelector('[name="report_type"]')?.value || 'sales';
-    const startDate = form.querySelector('[name="start_date"]')?.value || '';
-    const endDate = form.querySelector('[name="end_date"]')?.value || '';
-
-    const data = {
-        report_type: reportType,
-        format: format,
-        start_date: startDate,
-        end_date: endDate
-    };
-
-    // Add loading state (optional)
-    document.body.style.cursor = 'wait';
-
-    fetch('{% url "reports:export_report" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        document.body.style.cursor = '';
-        if (!response.ok) throw new Error('Export failed');
-        return response.blob();
-    })
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `sales_report_${startDate || 'all'}_${endDate || 'all'}.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    })
-    .catch(error => {
-        document.body.style.cursor = '';
-        console.error('Export error:', error);
-        alert('Failed to export report. Please try again.');
-    });
-}
-</script>
-{% endif %}
 {% endblock %}

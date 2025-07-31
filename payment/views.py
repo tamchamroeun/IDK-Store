@@ -75,6 +75,7 @@ def checkout(request):
                     
                     # Get shipping cost
                     shipping_method = checkout_form.cleaned_data['shipping_method']
+                    order.shipping_method = shipping_method
                     order.shipping_cost = Decimal(str(shipping_method.cost))
                     
                     # Apply coupon if provided
@@ -89,6 +90,10 @@ def checkout(request):
                                 order.total_amount -= discount_amount
                         except Coupon.DoesNotExist:
                             pass
+                    
+                    # Calculate tax (8% on subtotal + shipping - discount)
+                    taxable_amount = order.total_amount + order.shipping_cost - discount_amount
+                    order.tax_amount = taxable_amount * Decimal('0.08')
                     
                     order.save()
                     
@@ -225,6 +230,61 @@ def apply_coupon(request):
             return JsonResponse({'success': False, 'error': 'Invalid coupon code'})
     else:
         return JsonResponse({'success': False, 'error': 'Invalid form data'})
+
+
+@require_POST
+@login_required
+def calculate_order_totals(request):
+    """
+    Calculate order totals including shipping and tax via AJAX
+    """
+    try:
+        cart = Cart.objects.get(user=request.user)
+    except Cart.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Cart not found'})
+    
+    shipping_method_id = request.POST.get('shipping_method_id')
+    coupon_code = request.POST.get('coupon_code', '').strip()
+    
+    # Calculate base totals
+    subtotal = Decimal(str(cart.total_price))
+    shipping_cost = Decimal('0.00')
+    discount_amount = Decimal('0.00')
+    
+    # Get shipping cost
+    if shipping_method_id:
+        try:
+            shipping_method = ShippingMethod.objects.get(id=shipping_method_id, is_active=True)
+            shipping_cost = shipping_method.cost
+        except ShippingMethod.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Invalid shipping method'})
+    
+    # Apply coupon if provided
+    if coupon_code:
+        try:
+            coupon = Coupon.objects.get(code=coupon_code)
+            if coupon.is_valid:
+                discount_amount = coupon.calculate_discount(subtotal)
+            else:
+                return JsonResponse({'success': False, 'error': 'Coupon is not valid or has expired'})
+        except Coupon.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Invalid coupon code'})
+    
+    # Calculate tax (8% on subtotal + shipping - discount)
+    taxable_amount = subtotal + shipping_cost - discount_amount
+    tax_amount = taxable_amount * Decimal('0.08')
+    
+    # Calculate grand total
+    grand_total = subtotal + shipping_cost + tax_amount - discount_amount
+    
+    return JsonResponse({
+        'success': True,
+        'subtotal': float(subtotal),
+        'shipping_cost': float(shipping_cost),
+        'discount_amount': float(discount_amount),
+        'tax_amount': float(tax_amount),
+        'grand_total': float(grand_total)
+    })
 
 
 def order_success(request, order_id):
@@ -382,27 +442,27 @@ def order_tracking(request, order_id):
     return render(request, 'payment/order_tracking.html', context)
 
 
-# def send_order_confirmation_email(order):
-#     """
-#     Send order confirmation email - DISABLED since email field was removed
-#     """
-#     subject = f'Order Confirmation - {order.order_id}'
-#     html_message = render_to_string('payment/emails/order_confirmation.html', {
-#         'order': order,
-#         'site_name': 'MyEcommerce',
-#     })
-#     
-#     try:
-#         send_mail(
-#             subject=subject,
-#             message='',  # Plain text version can be added
-#             html_message=html_message,
-#             from_email=settings.DEFAULT_FROM_EMAIL,
-#             recipient_list=[order.email],
-#             fail_silently=False,
-#         )
-#     except Exception as e:
-#         print(f"Failed to send confirmation email: {e}")
+def send_order_confirmation_email(order):
+    """
+    Send order confirmation email - DISABLED since email field was removed
+    """
+    subject = f'Order Confirmation - {order.order_id}'
+    html_message = render_to_string('payment/emails/order_confirmation.html', {
+        'order': order,
+        'site_name': 'MyEcommerce',
+    })
+    
+    try:
+        send_mail(
+            subject=subject,
+            message='',  # Plain text version can be added
+            html_message=html_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[order.email],
+            fail_silently=False,
+        )
+    except Exception as e:
+        print(f"Failed to send confirmation email: {e}")
 
 
 # Admin views for managing orders
@@ -598,3 +658,15 @@ def admin_bulk_update_orders(request):
     
     messages.success(request, f"Updated {updated_count} orders to {new_status}.")
     return redirect('payment:admin_order_list')
+
+
+def debug_shipping(request):
+    """
+    Debug page for testing shipping method selection
+    """
+    shipping_methods = ShippingMethod.objects.filter(is_active=True)
+    context = {
+        'shipping_methods': shipping_methods,
+        'cart': {'total_price': 99.99}  # Mock cart data
+    }
+    return render(request, 'payment/debug_shipping.html', context)

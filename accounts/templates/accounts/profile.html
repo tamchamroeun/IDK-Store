@@ -5,182 +5,898 @@
 
 {% block extra_css %}
 <style>
+    :root {
+        --primary-color: #667eea;
+        --primary-hover: #5a6fd8;
+        --secondary-color: #764ba2;
+        --success-color: #10b981;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --info-color: #3b82f6;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --white: #ffffff;
+        --border-radius: 0.75rem;
+        --border-radius-lg: 1rem;
+        --border-radius-xl: 1.5rem;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .profile-wrapper {
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
     .profile-container {
-        max-width: 800px;
-        margin: 50px auto;
-        padding: 30px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 1000px;
+        background: var(--white);
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+        position: relative;
     }
-    
+
+    .profile-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: var(--gradient-primary);
+    }
+
     .profile-header {
+        background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+        padding: 3rem 2rem 2rem;
         text-align: center;
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--gray-200);
+        position: relative;
     }
-    
+
+    .profile-picture-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+    }
+
     .profile-picture {
-        width: 120px;
-        height: 120px;
+        width: 150px;
+        height: 150px;
         border-radius: 50%;
         object-fit: cover;
-        margin-bottom: 15px;
-        border: 4px solid #007bff;
+        border: 6px solid var(--white);
+        box-shadow: var(--shadow-lg);
+        transition: var(--transition);
+        background: var(--gray-100);
     }
-    
+
+    .profile-picture:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-xl);
+    }
+
     .default-avatar {
-        width: 120px;
-        height: 120px;
+        width: 150px;
+        height: 150px;
         border-radius: 50%;
-        background: #007bff;
+        background: var(--gradient-primary);
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 48px;
-        font-weight: bold;
-        margin: 0 auto 15px;
+        font-size: 3rem;
+        font-weight: 700;
+        border: 6px solid var(--white);
+        box-shadow: var(--shadow-lg);
+        transition: var(--transition);
+        text-transform: uppercase;
     }
-    
+
+    .default-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .profile-status-badge {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--success-color);
+        border: 3px solid var(--white);
+        box-shadow: var(--shadow);
+    }
+
+    .profile-header h2 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.025em;
+    }
+
+    .profile-header p {
+        color: var(--gray-600);
+        font-size: 1.1rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .profile-content {
+        padding: 2rem;
+    }
+
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        background: var(--gray-50);
+        padding: 1.5rem;
+        border-radius: var(--border-radius-lg);
+        text-align: center;
+        border: 1px solid var(--gray-200);
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-color);
+    }
+
+    .stat-icon {
+        width: 3rem;
+        height: 3rem;
+        background: var(--gradient-primary);
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        margin: 0 auto 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
     .profile-info {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 30px;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2.5rem;
     }
-    
+
     .info-group {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        transition: var(--transition);
+        position: relative;
     }
-    
+
+    .info-group:hover {
+        box-shadow: var(--shadow-lg);
+        border-color: var(--gray-300);
+    }
+
     .info-group h3 {
-        margin-bottom: 15px;
-        color: #333;
-        border-bottom: 2px solid #007bff;
-        padding-bottom: 5px;
-    }
-    
-    .info-item {
-        margin-bottom: 10px;
-    }
-    
-    .info-item strong {
-        color: #555;
-        display: inline-block;
-        width: 120px;
-    }
-    
-    .btn-group {
-        text-align: center;
-        gap: 15px;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin: 0 0 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--primary-color);
         display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-icon {
+        width: 2rem;
+        height: 2rem;
+        background: var(--gradient-primary);
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.875rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: var(--white);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--gray-200);
+        transition: var(--transition);
+    }
+
+    .info-item:hover {
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-label {
+        color: var(--gray-600);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        min-width: 120px;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .info-value {
+        color: var(--gray-900);
+        font-weight: 500;
+        flex: 1;
+        word-break: break-word;
+    }
+
+    .info-value.empty {
+        color: var(--gray-400);
+        font-style: italic;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        padding: 2rem;
+        background: var(--gray-50);
+        border-top: 1px solid var(--gray-200);
+        margin: 2rem -2rem -2rem;
+    }
+
+    .btn {
+        padding: 0.875rem 2rem;
+        border: none;
+        border-radius: var(--border-radius);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+        min-width: 160px;
         justify-content: center;
     }
-    
-    .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s;
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
     }
-    
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
     .btn-primary {
-        background: #007bff;
+        background: var(--gradient-primary);
         color: white;
+        box-shadow: var(--shadow);
     }
-    
+
     .btn-primary:hover {
-        background: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
     }
-    
+
     .btn-secondary {
-        background: #6c757d;
-        color: white;
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border: 2px solid var(--gray-300);
     }
-    
+
     .btn-secondary:hover {
-        background: #545b62;
+        background: var(--gray-200);
+        border-color: var(--gray-400);
+        transform: translateY(-1px);
     }
-    
+
+    .alert {
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        border: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .alert-error {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .alert-info {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--info-color);
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+
+    /* Activity timeline (if needed in future) */
+    .activity-timeline {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .timeline-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: var(--white);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--gray-200);
+    }
+
+    .timeline-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+    }
+
+    .timeline-content h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin: 0 0 0.25rem;
+    }
+
+    .timeline-content p {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
+        .profile-wrapper {
+            padding: 1rem 0.75rem;
+        }
+
+        .profile-header {
+            padding: 2rem 1.5rem 1.5rem;
+        }
+
+        .profile-header h2 {
+            font-size: 1.875rem;
+        }
+
+        .profile-picture,
+        .default-avatar {
+            width: 120px;
+            height: 120px;
+        }
+
+        .default-avatar {
+            font-size: 2.5rem;
+        }
+
+        .profile-content {
+            padding: 1.5rem;
+        }
+
         .profile-info {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
-        
+
+        .info-group {
+            padding: 1.5rem;
+        }
+
         .btn-group {
             flex-direction: column;
+            padding: 1.5rem;
+            margin: 1.5rem -1.5rem -1.5rem;
         }
+
+        .btn {
+            width: 100%;
+        }
+
+        .info-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .info-label {
+            margin-bottom: 0.25rem;
+            margin-right: 0;
+            min-width: auto;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-wrapper {
+            padding: 0.5rem 0.5rem;
+        }
+
+        .profile-header {
+            padding: 1.5rem 1rem;
+        }
+
+        .profile-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .profile-picture,
+        .default-avatar {
+            width: 100px;
+            height: 100px;
+        }
+
+        .default-avatar {
+            font-size: 2rem;
+        }
+
+        .profile-content {
+            padding: 1rem;
+        }
+
+        .info-group {
+            padding: 1rem;
+        }
+
+        .profile-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-group {
+            padding: 1rem;
+            margin: 1rem -1rem -1rem;
+        }
+    }
+
+    /* Enhanced animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .info-group {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .info-group:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    .stat-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .stat-card:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    .stat-card:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+
+    /* Status indicators */
+    .status-active {
+        color: var(--success-color);
+    }
+
+    .status-inactive {
+        color: var(--danger-color);
+    }
+
+    .role-icon {
+        margin-right: 0.5rem;
+    }
+
+    .copy-email {
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .copy-email:hover {
+        color: var(--primary-color);
+    }
+
+    /* Enhanced focus styles for accessibility */
+    .btn:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="profile-container">
-    <div class="profile-header">
-        {% if profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="profile-picture">
-        {% else %}
-            <div class="default-avatar">
-                {{ user.first_name|first|default:user.username|first }}
+<div class="profile-wrapper">
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-picture-container">
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="profile-picture">
+                {% else %}
+                    <div class="default-avatar">
+                        {{ user.first_name|first|default:user.username|first }}
+                    </div>
+                {% endif %}
+                <div class="profile-status-badge" title="Active User"></div>
+            </div>
+            <h2>{{ user.get_full_name|default:user.username }}</h2>
+            <p>
+                <i class="fas fa-calendar-alt"></i>
+                Member since {{ user.date_joined|date:"F Y" }}
+            </p>
+        </div>
+        
+        {% if messages %}
+            <div class="profile-content">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
             </div>
         {% endif %}
-        <h2>{{ user.get_full_name|default:user.username }}</h2>
-        <p class="text-muted">Member since {{ user.date_joined|date:"F Y" }}</p>
-    </div>
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-    
-    <div class="profile-info">
-        <div class="info-group">
-            <h3>Account Information</h3>
-            <div class="info-item">
-                <strong>Username:</strong> {{ user.username }}
+        
+        <div class="profile-content">
+            <!-- Profile Statistics -->
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-value">{{ user.orders.count|default:0 }}</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-value">{{ user.wishlist_items.count|default:0 }}</div>
+                    <div class="stat-label">Wishlist Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value">{{ user.reviews.count|default:0 }}</div>
+                    <div class="stat-label">Reviews Written</div>
+                </div>
             </div>
-            <div class="info-item">
-                <strong>Email:</strong> {{ user.email|default:"Not provided" }}
-            </div>
-            <div class="info-item">
-                <strong>First Name:</strong> {{ user.first_name|default:"Not provided" }}
-            </div>
-            <div class="info-item">
-                <strong>Last Name:</strong> {{ user.last_name|default:"Not provided" }}
+
+            <!-- Profile Information -->
+            <div class="profile-info">
+                <div class="info-group">
+                    <h3>
+                        <span class="section-icon">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        Account Information
+                    </h3>
+                    <div class="info-item">
+                        <span class="info-label">Username</span>
+                        <span class="info-value">{{ user.username }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value {% if not user.email %}empty{% endif %}">
+                            {{ user.email|default:"Not provided" }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">First Name</span>
+                        <span class="info-value {% if not user.first_name %}empty{% endif %}">
+                            {{ user.first_name|default:"Not provided" }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Name</span>
+                        <span class="info-value {% if not user.last_name %}empty{% endif %}">
+                            {{ user.last_name|default:"Not provided" }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Account Status</span>
+                        <span class="info-value">
+                            {% if user.is_active %}
+                                <i class="fas fa-check-circle status-active"></i> Active
+                            {% else %}
+                                <i class="fas fa-times-circle status-inactive"></i> Inactive
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-group">
+                    <h3>
+                        <span class="section-icon">
+                            <i class="fas fa-id-card"></i>
+                        </span>
+                        Profile Information
+                    </h3>
+                    <div class="info-item">
+                        <span class="info-label">Role</span>
+                        <span class="info-value">
+                            <i class="fas fa-{% if profile.role == 'admin' %}user-shield{% elif profile.role == 'manager' %}user-tie{% else %}user{% endif %} role-icon"></i>
+                            {{ profile.get_role_display }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Phone</span>
+                        <span class="info-value {% if not profile.phone_number %}empty{% endif %}">
+                            {{ profile.phone_number|default:"Not provided" }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Date of Birth</span>
+                        <span class="info-value {% if not profile.date_of_birth %}empty{% endif %}">
+                            {{ profile.date_of_birth|default:"Not provided" }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Address</span>
+                        <span class="info-value {% if not profile.address %}empty{% endif %}">
+                            {{ profile.address|default:"Not provided" }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Profile Created</span>
+                        <span class="info-value">
+                            <i class="fas fa-calendar-plus role-icon"></i>
+                            {{ profile.created_at|date:"F d, Y" }}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div class="info-group">
-            <h3>Profile Information</h3>
-            <div class="info-item">
-                <strong>Role:</strong> {{ profile.get_role_display }}
-            </div>
-            <div class="info-item">
-                <strong>Phone:</strong> {{ profile.phone_number|default:"Not provided" }}
-            </div>
-            <div class="info-item">
-                <strong>Date of Birth:</strong> {{ profile.date_of_birth|default:"Not provided" }}
-            </div>
-            <div class="info-item">
-                <strong>Address:</strong> {{ profile.address|default:"Not provided" }}
-            </div>
-            <div class="info-item">
-                <strong>Profile Created:</strong> {{ profile.created_at|date:"F d, Y" }}
-            </div>
+        <div class="btn-group">
+            <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i>
+                Edit Profile
+            </a>
+            <a href="{% url 'store:home' %}" class="btn btn-secondary">
+                <i class="fas fa-store"></i>
+                Back to Store
+            </a>
         </div>
     </div>
-    
-    <div class="btn-group">
-        <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">Edit Profile</a>
-        <a href="{% url 'store:home' %}" class="btn btn-secondary">Back to Store</a>
-    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced interactions and animations
+    const infoItems = document.querySelectorAll('.info-item');
+    const statCards = document.querySelectorAll('.stat-card');
+    
+    // Add hover effects to info items
+    infoItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(5px)';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+        });
+    });
+    
+    // Add click effects to stat cards
+    statCards.forEach(card => {
+        card.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+    
+    // Auto-hide alerts after 5 seconds
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                alert.remove();
+            }, 300);
+        }, 5000);
+    });
+    
+    // Enhanced mobile interactions
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        const interactiveElements = document.querySelectorAll('.btn, .stat-card, .profile-picture, .default-avatar');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+    }
+    
+    // Intersection Observer for animations
+    if ('IntersectionObserver' in window) {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe profile sections
+        document.querySelectorAll('.info-group, .stat-card').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // E key to edit profile
+        if (e.key === 'e' && e.ctrlKey) {
+            e.preventDefault();
+            const editBtn = document.querySelector('a[href*="edit_profile"]');
+            if (editBtn) {
+                editBtn.click();
+            }
+        }
+        
+        // H key to go to store
+        if (e.key === 'h' && e.ctrlKey) {
+            e.preventDefault();
+            const storeBtn = document.querySelector('a[href*="store"]');
+            if (storeBtn) {
+                storeBtn.click();
+            }
+        }
+    });
+    
+    // Copy email to clipboard functionality
+    const emailElement = document.querySelector('.info-item:nth-child(2) .info-value');
+    if (emailElement && emailElement.textContent.trim() !== 'Not provided') {
+        emailElement.style.cursor = 'pointer';
+        emailElement.title = 'Click to copy email';
+        
+        emailElement.addEventListener('click', function() {
+            const email = this.textContent.trim();
+            navigator.clipboard.writeText(email).then(() => {
+                // Show temporary success message
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check" style="color: var(--success-color);"></i> Copied!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            }).catch(() => {
+                console.log('Failed to copy email');
+            });
+        });
+    }
+    
+    // Profile picture upload preview (if edit functionality is added)
+    const profilePicture = document.querySelector('.profile-picture, .default-avatar');
+    if (profilePicture) {
+        profilePicture.addEventListener('click', function() {
+            // Add a subtle animation to indicate interactivity
+            this.style.animation = 'pulse 0.5s ease-in-out';
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 500);
+        });
+    }
+});
+
+// Add pulse animation for profile picture
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+`;
+document.head.appendChild(style);
+</script>
 {% endblock %}

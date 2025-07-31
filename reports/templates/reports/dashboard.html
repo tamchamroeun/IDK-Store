@@ -1,161 +1,227 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
-{% block title %}Sales Reports Dashboard - E-commerce App{% endblock %}
+{% block title %}Sales Reports Dashboard{% endblock %}
 
 {% block extra_css %}
 <style>
-    .dashboard-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 8px;
-        margin-bottom: 2rem;
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --success-color: #28a745;
+        --info-color: #17a2b8;
+        --danger-color: #ef4444;
+        --warning-color: #ffc107;
+        --background: #f8fafc;
+        --background-white: #fff;
+        --card-radius: 1rem;
+        --card-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        --transition: all 0.22s cubic-bezier(.4,0,.2,1);
     }
-    
+
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 2rem 1.5rem;
+        border-radius: var(--card-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--card-shadow);
+        text-align: center;
+    }
+    .dashboard-header h1 {
+        font-size: clamp(1.5rem, 6vw, 2.2rem);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #fff;
+    }
+    .dashboard-header p {
+        color: #ffffffde;
+        opacity: 0.93;
+        font-size: 1.08rem;
+        font-weight: 400;
+        margin-bottom: 0;
+    }
+
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
         margin-bottom: 2rem;
+        width: 100%;
     }
-    
+
     .stat-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        background: var(--background-white);
+        padding: 1.25rem 1rem;
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
         text-align: center;
-        transition: transform 0.3s ease;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 140px;
     }
-    
     .stat-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.11);
     }
-    
     .stat-card .icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .stat-card .value {
-        font-size: 2rem;
-        font-weight: bold;
+        font-size: 2.1rem;
         margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    
+    .stat-card.revenue .icon { color: var(--success-color);}
+    .stat-card.orders .icon { color: var(--primary-color);}
+    .stat-card.average .icon { color: var(--warning-color);}
+    .stat-card.customers .icon { color: var(--secondary-color);}
+
+    .stat-card .value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 0.2rem;
+        letter-spacing: 0.5px;
+    }
     .stat-card .label {
-        color: #666;
-        font-size: 0.9rem;
+        color: #7a7a99;
+        font-size: 0.93rem;
+        font-weight: 500;
+        opacity: 0.95;
     }
-    
-    .stat-card.revenue .icon { color: #28a745; }
-    .stat-card.orders .icon { color: #007bff; }
-    .stat-card.average .icon { color: #ffc107; }
-    .stat-card.customers .icon { color: #6f42c1; }
-    
+
     .report-section {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        background: var(--background-white);
+        padding: 1.25rem 1rem;
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
         margin-bottom: 2rem;
+        width: 100%;
+        overflow-x: auto;
     }
-    
     .section-title {
         color: #333;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
+        font-weight: 700;
+        font-size: 1.18rem;
         border-bottom: 2px solid #f8f9fa;
+        letter-spacing: 0.5px;
     }
-    
+
     .btn-group {
         display: flex;
         gap: 1rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.2rem;
         flex-wrap: wrap;
     }
-    
     .btn {
-        padding: 0.5rem 1rem;
+        padding: 0.5rem 1.05rem;
         border: none;
-        border-radius: 4px;
+        border-radius: 6px;
         text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: 0.98rem;
+        transition: var(--transition);
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
+        background: #e9ecef;
+        color: #333;
+        outline: none;
     }
-    
     .btn-primary {
-        background: #007bff;
+        background: var(--primary-color);
         color: white;
     }
-    
     .btn-success {
-        background: #28a745;
+        background: var(--success-color);
         color: white;
     }
-    
     .btn-info {
-        background: #17a2b8;
+        background: var(--info-color);
         color: white;
     }
-    
-    .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    .btn:hover, .btn:focus-visible {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        opacity: 0.95;
     }
-    
+
     .table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 1rem;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        font-size: 1rem;
     }
-    
-    .table th,
-    .table td {
-        padding: 0.75rem;
+    .table th, .table td {
+        padding: 0.7rem 0.6rem;
         text-align: left;
-        border-bottom: 1px solid #dee2e6;
+        border-bottom: 1px solid #edeef2;
+        min-width: 100px;
+        vertical-align: middle;
     }
-    
     .table th {
-        background: #f8f9fa;
-        font-weight: 600;
+        background: #f4f4fa;
+        font-weight: 700;
         color: #495057;
     }
-    
     .table tr:hover {
         background: #f8f9fa;
     }
-    
-    .status-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 500;
+    .table td {
+        font-size: 0.98rem;
     }
-    
+
+    .status-badge {
+        padding: 0.27rem 0.68rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        white-space: nowrap;
+        letter-spacing: 0.03em;
+        display: inline-block;
+    }
     .status-pending { background: #fff3cd; color: #856404; }
     .status-confirmed { background: #d4edda; color: #155724; }
     .status-processing { background: #cce5ff; color: #004085; }
     .status-shipped { background: #e2e3e5; color: #383d41; }
     .status-delivered { background: #d1ecf1; color: #0c5460; }
-    
-    @media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .btn-group {
-            flex-direction: column;
-        }
-        
-        .table {
-            font-size: 0.9rem;
-        }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+        .dashboard-header { padding: 1.5rem 0.8rem;}
+        .stats-grid { gap: 0.7rem;}
+        .stat-card { padding: 1rem 0.5rem;}
+        .report-section { padding: 1rem 0.4rem;}
+    }
+    @media (max-width: 600px) {
+        .dashboard-header h1 { font-size: 1.25rem;}
+        .dashboard-header { padding: 1rem 0.5rem;}
+        .stats-grid { grid-template-columns: 1fr; }
+        .stat-card { min-height: 120px; font-size: 1rem;}
+        .btn-group { flex-direction: column; gap: 0.5rem;}
+        .section-title { font-size: 1.05rem;}
+        .table th, .table td { padding: 0.55rem 0.32rem; font-size: 0.93rem;}
+    }
+    /* Table horizontal scrolling for mobile */
+    @media (max-width: 480px) {
+        .report-section { padding: 0.5rem 0.1rem;}
+        .table { font-size: 0.89rem; }
+        .stat-card .value { font-size: 1.1rem;}
+        .stat-card .icon { font-size: 1.5rem;}
+    }
+    /* For overflow on tiny screens */
+    .report-section {
+        overflow-x: auto;
+    }
+    .table {
+        min-width: 450px;
     }
 </style>
 {% endblock %}
@@ -173,19 +239,16 @@
         <div class="value">${{ stats.total_revenue|floatformat:2 }}</div>
         <div class="label">Revenue from Delivered Orders (Last 30 days)</div>
     </div>
-    
     <div class="stat-card orders">
         <div class="icon"><i class="fas fa-shopping-cart"></i></div>
         <div class="value">{{ stats.total_orders }}</div>
         <div class="label">Total Orders (Last 30 days)</div>
     </div>
-    
     <div class="stat-card average">
         <div class="icon"><i class="fas fa-chart-bar"></i></div>
         <div class="value">${{ stats.average_order_value|floatformat:2 }}</div>
         <div class="label">Average Value (Delivered Orders)</div>
     </div>
-    
     <div class="stat-card customers">
         <div class="icon"><i class="fas fa-users"></i></div>
         <div class="value">{{ stats.total_customers }}</div>
@@ -207,6 +270,7 @@
 <div class="report-section">
     <h2 class="section-title">Recent Orders</h2>
     {% if recent_orders %}
+        <div style="overflow-x:auto;">
         <table class="table">
             <thead>
                 <tr>
@@ -233,6 +297,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     {% else %}
         <p>No recent orders found.</p>
     {% endif %}
@@ -242,6 +307,7 @@
 <div class="report-section">
     <h2 class="section-title">Top Selling Products (Last 30 days)</h2>
     {% if top_products %}
+        <div style="overflow-x:auto;">
         <table class="table">
             <thead>
                 <tr>
@@ -260,6 +326,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     {% else %}
         <p>No product sales data available.</p>
     {% endif %}

@@ -1,244 +1,611 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
-{% block title %}Admin - Orders Management - MyEcommerce{% endblock %}
+{% block title %}Admin - Orders Management{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-body { background: #f3f3fd; }
+/* CSS Variables for consistency */
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --dark: #1f2937;
+    --gray: #6b7280;
+    --light: #f9fafb;
+    --white: #ffffff;
+    
+    --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    --border-radius: 12px;
+    --border-radius-lg: 16px;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --container-max: 1200px;
+}
+
+body { 
+    background: linear-gradient(135deg, #fafbff 0%, #f1f5f9 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
 .admin-container {
-    max-width: 1400px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 20px 10px 40px 10px;
+    padding: 1rem;
 }
+
+@media (min-width: 768px) {
+    .admin-container {
+        padding: 2rem;
+    }
+}
+
 .admin-header {
-    background: linear-gradient(135deg, #7b2ff2 0%, #f357a8 100%);
+    background: var(--gradient-primary);
     color: white;
-    padding: 38px 28px 32px 28px;
-    border-radius: 18px 18px 0 0;
-    margin-bottom: 38px;
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
     text-align: center;
-    box-shadow: 0 4px 32px 0 #7b2ff215;
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(10px);
 }
+
 .admin-title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    letter-spacing: 1.2px;
-    background: linear-gradient(90deg, #fff 80%, #ece5ff 100%);
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+    background: linear-gradient(90deg, #fff 0%, #e0e7ff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
+
 .admin-header .fa-clipboard-list {
-    font-size: 2.3rem;
+    font-size: 2rem;
     color: #fff;
-    margin-right: 10px;
+    margin-right: 0.5rem;
 }
+
 .admin-subtitle {
-    opacity: 0.95;
-    font-size: 1.12rem;
+    opacity: 0.9;
+    font-size: 1rem;
     font-weight: 500;
-    letter-spacing: 0.2px;
+    margin: 0;
 }
+
+@media (min-width: 768px) {
+    .admin-subtitle {
+        font-size: 1.125rem;
+    }
+}
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 22px;
-    margin-bottom: 34px;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
+
+@media (min-width: 768px) {
+    .stats-grid {
+        gap: 1.5rem;
+    }
+}
+
 .stat-card {
-    background: #fff;
-    padding: 24px 0 18px 0;
-    border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(123,47,242,0.07);
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
     text-align: center;
-    transition: transform 0.28s, box-shadow 0.28s;
+    transition: all 0.3s ease;
     cursor: pointer;
-    border: 2.5px solid transparent;
+    border: 1px solid rgba(99, 102, 241, 0.1);
 }
+
 .stat-card:hover {
-    transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 6px 24px rgba(123,47,242,0.13);
-    border-color: #ede7ff;
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
 }
+
 .stat-number {
     font-size: 2rem;
-    font-weight: bold;
-    color: #7b2ff2;
-    margin-bottom: 4px;
-    letter-spacing: 0.8px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    line-height: 1;
 }
+
 .stat-label {
-    color: #666;
-    font-size: 14px;
+    color: var(--gray);
+    font-size: 0.875rem;
     text-transform: uppercase;
     font-weight: 600;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.05em;
 }
+
 .filters-section {
-    background: white;
-    padding: 20px 16px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(123,47,242,0.07);
-    margin-bottom: 18px;
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
 }
+
 .filters-form {
     display: flex;
-    gap: 15px;
+    gap: 1rem;
     align-items: end;
     flex-wrap: wrap;
 }
+
+@media (max-width: 767px) {
+    .filters-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+}
+
 .form-group {
     flex: 1;
-    min-width: 160px;
+    min-width: 200px;
 }
+
+@media (max-width: 767px) {
+    .form-group {
+        min-width: auto;
+    }
+}
+
 .form-label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #333;
+    color: var(--dark);
+    font-size: 0.875rem;
 }
+
 .form-control {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 15px;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: var(--white);
 }
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-text {
+    font-size: 0.75rem;
+    color: var(--gray);
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.text-muted {
+    color: var(--gray) !important;
+}
+
 .btn {
-    padding: 8px 16px;
+    padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     cursor: pointer;
     text-decoration: none;
-    display: inline-block;
-    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    min-height: 44px;
+    justify-content: center;
 }
+
 .btn-primary {
-    background-color: #7b2ff2;
+    background: var(--primary);
     color: white;
-    border: none;
+    border: 1px solid var(--primary);
 }
+
 .btn-primary:hover {
-    background-color: #6144c0;
-    color: white;
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
 }
+
 .btn-secondary {
-    background-color: #6c757d;
-    color: white;
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
 }
+
 .btn-secondary:hover {
-    background-color: #5a6268;
+    background: var(--danger);
+    color: white;
+    transform: translateY(-1px);
 }
+
 .btn-outline-primary {
-    border: 2px solid #7b2ff2;
-    color: #7b2ff2;
-    background: #fff;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    background: var(--white);
 }
+
 .btn-outline-primary:hover {
-    background: #ede7ff;
-    color: #7b2ff2;
+    background: var(--primary);
+    color: white;
+    transform: translateY(-1px);
 }
+
 .btn-sm {
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    min-height: 36px;
 }
-.orders-table {
-    background: white;
-    border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(123,47,242,0.07);
+
+/* Mobile-first responsive table */
+.orders-section {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.table-responsive {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
+
 .table {
     width: 100%;
     margin: 0;
     border-collapse: collapse;
+    min-width: 800px;
 }
+
 .table th {
-    background: #f8f9fa;
-    padding: 15px;
+    background: #f8fafc;
+    padding: 1rem;
     text-align: left;
-    font-weight: 700;
-    color: #232b3b;
-    border-bottom: 2px solid #e2e7f2;
-    letter-spacing: 0.6px;
+    font-weight: 600;
+    color: var(--dark);
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
+
 .table td {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
     vertical-align: middle;
-    font-size: 1.04rem;
+    font-size: 0.875rem;
 }
-.table tr:hover {
-    background-color: #f7f7fa;
+
+.table tbody tr:hover {
+    background-color: #f9fafb;
 }
+
 .order-id {
-    font-family: monospace;
-    font-weight: bold;
-    color: #7b2ff2;
-    letter-spacing: 0.5px;
-    font-size: 1.01rem;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.875rem;
 }
-.customer-info { margin-bottom: 2px; }
+
+.customer-info {
+    margin-bottom: 0.25rem;
+}
+
 .customer-name {
     font-weight: 600;
-    color: #232b3b;
-    font-size: 1.04rem;
+    color: var(--dark);
+    font-size: 0.875rem;
+    margin-bottom: 0.125rem;
 }
+
 .customer-email {
-    color: #888;
-    font-size: 12px;
+    color: var(--gray);
+    font-size: 0.75rem;
 }
+
 .status-badge {
-    display: inline-block;
-    padding: 5px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.05em;
 }
-.status-pending { background-color: #fff2cc; color: #e17055; }
-.status-confirmed { background-color: #d0f8ef; color: #00b894; }
-.status-processing { background-color: #c7c3f5; color: #6c5ce7; }
-.status-shipped { background-color: #fdc5e9; color: #e84393; }
-.status-delivered { background-color: #b7e0fa; color: #0984e3; }
-.status-cancelled { background-color: #ffe0d2; color: #e17055; }
-.status-refunded { background-color: #fdc5e9; color: #e84393; }
+
+.status-pending { 
+    background-color: #fef3c7; 
+    color: #92400e; 
+}
+
+.status-confirmed { 
+    background-color: #d1fae5; 
+    color: #065f46; 
+}
+
+.status-processing { 
+    background-color: #ddd6fe; 
+    color: #5b21b6; 
+}
+
+.status-shipped { 
+    background-color: #fce7f3; 
+    color: #be185d; 
+}
+
+.status-delivered { 
+    background-color: #dbeafe; 
+    color: #1e40af; 
+}
+
+.status-cancelled { 
+    background-color: #fee2e2; 
+    color: #991b1b; 
+}
+
+.status-refunded { 
+    background-color: #fce7f3; 
+    color: #be185d; 
+}
+
 .action-buttons {
     display: flex;
-    gap: 7px;
+    gap: 0.5rem;
+    align-items: center;
 }
+
 .select-status {
     width: auto;
-    display: inline-block;
-    margin-top: 5px;
+    min-width: 120px;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.5rem;
 }
+
 .empty-state {
     text-align: center;
-    padding: 70px 20px 60px 20px;
-    color: #666;
+    padding: 4rem 2rem;
+    color: var(--gray);
 }
+
 .empty-state i {
-    font-size: 4.3rem;
-    margin-bottom: 22px;
-    color: #eaeaea;
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    color: #d1d5db;
 }
-@media (max-width: 900px) {
-    .admin-container { padding: 7px; }
-    .admin-header { padding: 25px 3vw 18px 3vw; }
-    .orders-table th, .orders-table td { padding: 8px 3px; font-size: 13px; }
-    .filters-section { padding: 10px 3vw; }
-    .stats-grid { gap: 10px; }
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
 }
-@media (max-width: 600px) {
-    .admin-title { font-size: 1.3rem; }
-    .stats-grid { grid-template-columns: 1fr; gap: 14px;}
-    .filters-form { flex-direction: column; gap: 10px;}
+
+.empty-state p {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Mobile Card Layout */
+@media (max-width: 767px) {
+    .table-responsive {
+        display: none;
+    }
+    
+    .orders-mobile {
+        display: block;
+        padding: 1rem;
+        gap: 1rem;
+    }
+    
+    .order-card {
+        background: var(--white);
+        border: 1px solid #e5e7eb;
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow);
+    }
+    
+    .order-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .order-card-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .order-field {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .order-field-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+    }
+    
+    .order-field-value {
+        font-size: 0.875rem;
+        color: var(--dark);
+        font-weight: 500;
+    }
+    
+    .order-card-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        padding-top: 1rem;
+        border-top: 1px solid #f3f4f6;
+    }
+    
+    .order-card-actions .btn {
+        flex: 1;
+        min-width: auto;
+    }
+    
+    .order-card-actions .select-status {
+        flex: 1;
+        min-width: auto;
+    }
+}
+
+/* Desktop: Show table, hide mobile cards */
+@media (min-width: 768px) {
+    .orders-mobile {
+        display: none;
+    }
+    
+    .table-responsive {
+        display: block;
+    }
+}
+
+/* Improved button group for filters */
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+    .filter-buttons {
+        width: 100%;
+    }
+    
+    .filter-buttons .btn {
+        flex: 1;
+    }
+}
+
+/* Loading states and animations */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.form-control:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.orders-section,
+.order-card {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .admin-container {
+        padding: 0.5rem;
+    }
+    
+    .admin-header {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .filters-section {
+        padding: 1rem;
+    }
+    
+    .order-card-body {
+        grid-template-columns: 1fr;
+    }
+    
+    .order-card-actions {
+        flex-direction: column;
+    }
+}
+
+/* Print styles */
+@media print {
+    .filters-section,
+    .admin-header .btn,
+    .action-buttons {
+        display: none;
+    }
+    
+    body {
+        background: white;
+    }
+    
+    .admin-container {
+        max-width: none;
+        padding: 0;
+    }
 }
 </style>
 {% endblock %}
@@ -261,16 +628,28 @@ body { background: #f3f3fd; }
             <div class="stat-label">Total Orders</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">{{ pending_count }}</div>
+            <div class="stat-number">{{ pending_orders }}</div>
             <div class="stat-label">Pending</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">{{ shipped_count }}</div>
+            <div class="stat-number">{{ confirmed_orders }}</div>
+            <div class="stat-label">Confirmed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ shipped_orders }}</div>
             <div class="stat-label">Shipped</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">{{ delivered_count }}</div>
+            <div class="stat-number">{{ delivered_orders }}</div>
             <div class="stat-label">Delivered</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ cancelled_orders }}</div>
+            <div class="stat-label">Cancelled</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ refunded_orders }}</div>
+            <div class="stat-label">Refunded</div>
         </div>
     </div>
 
@@ -287,88 +666,166 @@ body { background: #f3f3fd; }
                         </option>
                     {% endfor %}
                 </select>
+                <small class="form-text text-muted">Select an order status to filter</small>
             </div>
             <div class="form-group">
-                <label for="search" class="form-label">Search:</label>
-                <input type="text" name="search" id="search" class="form-control"
+                <label for="search" class="form-label">Search Orders:</label>
+                <input type="text" 
+                       name="search" 
+                       id="search" 
+                       class="form-control"
                        placeholder="Order ID, customer name, email..."
-                       value="{{ search_query }}">
+                       value="{{ search_query|default:'' }}"
+                       autocomplete="off"
+                       spellcheck="false">
+                <small class="form-text text-muted">Press Enter to search or wait 0.5s for auto-search</small>
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Filter
-                </button>
-                <a href="{% url 'orders:admin_order_list' %}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Clear
-                </a>
+                <div class="filter-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                    <a href="{% url 'orders:admin_order_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+                <small class="form-text text-muted">Reset filters and show all orders</small>
             </div>
         </form>
     </div>
 
     <!-- Orders Table -->
     {% if orders %}
-    <div class="orders-table">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Date</th>
-                    <th>Items</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                <tr>
-                    <td>
-                        <div class="order-id">#{{ order.order_id|truncatechars:12 }}</div>
-                    </td>
-                    <td>
-                        <div class="customer-info">
+    <div class="orders-section">
+        <!-- Desktop Table View -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>
+                            <div class="order-id">#{{ order.order_id|truncatechars:12 }}</div>
+                        </td>
+                        <td>
+                            <div class="customer-info">
+                                <div class="customer-name">{{ order.first_name }} {{ order.last_name }}</div>
+                                <div class="customer-email">{{ order.email }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>{{ order.created_at|date:"M d, Y" }}</div>
+                            <small class="text-muted">{{ order.created_at|time:"g:i A" }}</small>
+                        </td>
+                        <td>
+                            {{ order.total_items }} item{{ order.total_items|pluralize }}
+                        </td>
+                        <td>
+                            <strong>${{ order.grand_total|floatformat:2 }}</strong>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ order.status }}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'orders:admin_order_detail' order.order_id %}"
+                                   class="btn btn-outline-primary btn-sm" title="View Order">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if order.status != 'delivered' and order.status != 'cancelled' %}
+                                    <select class="form-control btn-sm select-status"
+                                            title="Update order status"
+                                            onchange="updateOrderStatus('{{ order.order_id }}', this.value)">
+                                        {% for value, display in order_status_choices %}
+                                            <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
+                                                {{ display }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div class="orders-mobile">
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-card-header">
+                    <div class="order-id">#{{ order.order_id|truncatechars:12 }}</div>
+                    <span class="status-badge status-{{ order.status }}">
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+                
+                <div class="order-card-body">
+                    <div class="order-field">
+                        <div class="order-field-label">Customer</div>
+                        <div class="order-field-value">
                             <div class="customer-name">{{ order.first_name }} {{ order.last_name }}</div>
                             <div class="customer-email">{{ order.email }}</div>
                         </div>
-                    </td>
-                    <td>
-                        <div>{{ order.created_at|date:"M d, Y" }}</div>
-                        <small class="text-muted">{{ order.created_at|time:"g:i A" }}</small>
-                    </td>
-                    <td>
-                        {{ order.total_items }} item{{ order.total_items|pluralize }}
-                    </td>
-                    <td>
-                        <strong>${{ order.grand_total|floatformat:2 }}</strong>
-                    </td>
-                    <td>
-                        <span class="status-badge status-{{ order.status }}">
-                            {{ order.get_status_display }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="{% url 'orders:admin_order_detail' order.order_id %}"
-                               class="btn btn-outline-primary btn-sm" title="View Order">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            {% if order.status != 'delivered' and order.status != 'cancelled' %}
-                                <select class="form-control btn-sm select-status"
-                                        onchange="updateOrderStatus('{{ order.order_id }}', this.value)">
-                                    {% for value, display in order_status_choices %}
-                                        <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
-                                            {{ display }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            {% endif %}
+                    </div>
+                    
+                    <div class="order-field">
+                        <div class="order-field-label">Date</div>
+                        <div class="order-field-value">
+                            {{ order.created_at|date:"M d, Y" }}<br>
+                            <small>{{ order.created_at|time:"g:i A" }}</small>
                         </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    </div>
+                    
+                    <div class="order-field">
+                        <div class="order-field-label">Items</div>
+                        <div class="order-field-value">
+                            {{ order.total_items }} item{{ order.total_items|pluralize }}
+                        </div>
+                    </div>
+                    
+                    <div class="order-field">
+                        <div class="order-field-label">Total</div>
+                        <div class="order-field-value">
+                            <strong>${{ order.grand_total|floatformat:2 }}</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="order-card-actions">
+                    <a href="{% url 'orders:admin_order_detail' order.order_id %}"
+                       class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                    {% if order.status != 'delivered' and order.status != 'cancelled' %}
+                        <select class="form-control btn-sm select-status"
+                                title="Update order status"
+                                onchange="updateOrderStatus('{{ order.order_id }}', this.value)">
+                            {% for value, display in order_status_choices %}
+                                <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
+                                    {{ display }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
     {% else %}
         <!-- Empty State -->
@@ -386,11 +843,314 @@ body { background: #f3f3fd; }
 
 {% block extra_js %}
 <script>
+// Enhanced search and filter functionality with AJAX
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search');
+    const statusSelect = document.getElementById('status');
+    const filterForm = document.querySelector('.filters-form');
+    const ordersSection = document.querySelector('.orders-section');
+    const emptyState = document.querySelector('.empty-state');
+    const statsGrid = document.querySelector('.stats-grid');
+    
+    // Real-time search functionality with AJAX
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                performAjaxSearch();
+            }, 500); // Debounce search after 500ms
+        });
+    }
+    
+    // Auto-submit on status change with AJAX
+    if (statusSelect) {
+        statusSelect.addEventListener('change', function() {
+            performAjaxSearch();
+        });
+    }
+    
+    // Prevent form submission and use AJAX instead
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent page reload
+            performAjaxSearch();
+        });
+    }
+    
+    // Clear search functionality
+    const clearBtn = document.querySelector('.btn-secondary[href*="admin_order_list"]');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent page reload
+            searchInput.value = '';
+            statusSelect.value = '';
+            
+            // Update URL to base URL without parameters
+            const baseUrl = window.location.href.split('?')[0];
+            window.history.pushState({}, '', baseUrl);
+            
+            // Perform AJAX search with empty values
+            performAjaxSearch();
+        });
+    }
+    
+    // Enhanced search with Enter key
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performAjaxSearch();
+            }
+        });
+    }
+    
+    // AJAX search function
+    function performAjaxSearch() {
+        const searchValue = searchInput.value;
+        const statusValue = statusSelect.value;
+        
+        console.log('Performing AJAX search:', { searchValue, statusValue });
+        
+        // Show loading state
+        showLoadingState();
+        
+        // Prepare URL with parameters
+        const url = new URL(window.location.href.split('?')[0]); // Remove existing params
+        if (searchValue) url.searchParams.set('search', searchValue);
+        if (statusValue) url.searchParams.set('status', statusValue);
+        url.searchParams.set('ajax', '1');
+        
+        console.log('AJAX URL:', url.toString());
+        
+        fetch(url.toString(), {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            console.log('AJAX Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(html => {
+            console.log('AJAX Response received, length:', html.length);
+            console.log('Response preview:', html.substring(0, 200));
+            
+            // Create a temporary container to parse the response
+            const responseContainer = document.createElement('div');
+            responseContainer.innerHTML = html.trim();
+            
+            // Update stats grid
+            const newStatsGrid = responseContainer.querySelector('.stats-grid');
+            if (newStatsGrid && statsGrid) {
+                console.log('Updating stats grid');
+                statsGrid.innerHTML = newStatsGrid.innerHTML;
+                animateStats();
+            } else {
+                console.log('Stats grid not found in response');
+            }
+            
+            // Check if we have orders or empty state
+            const newOrdersSection = responseContainer.querySelector('.orders-section');
+            const newEmptyState = responseContainer.querySelector('.empty-state');
+            
+            console.log('Orders section found:', !!newOrdersSection);
+            console.log('Empty state found:', !!newEmptyState);
+            
+            // First, ensure we have the parent container for empty state
+            let parentContainer = ordersSection ? ordersSection.parentNode : document.querySelector('.admin-container');
+            
+            if (newOrdersSection) {
+                // Show orders section, hide empty state
+                if (ordersSection) {
+                    ordersSection.innerHTML = newOrdersSection.innerHTML;
+                    ordersSection.style.display = 'block';
+                    console.log('Updated orders section with new content');
+                }
+                if (emptyState) {
+                    emptyState.style.display = 'none';
+                }
+                
+                // Re-bind event listeners for new elements
+                bindOrderEvents();
+                
+            } else if (newEmptyState) {
+                // Show empty state, hide orders section
+                if (ordersSection) {
+                    ordersSection.style.display = 'none';
+                }
+                
+                if (emptyState) {
+                    emptyState.innerHTML = newEmptyState.innerHTML;
+                    emptyState.style.display = 'block';
+                    console.log('Updated existing empty state');
+                } else {
+                    // Create empty state if it doesn't exist
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-state';
+                    emptyDiv.innerHTML = newEmptyState.innerHTML;
+                    emptyDiv.style.display = 'block';
+                    parentContainer.appendChild(emptyDiv);
+                    console.log('Created new empty state element');
+                }
+            } else {
+                // No content found - create default empty state
+                console.log('No orders or empty state found in response, creating default');
+                if (ordersSection) {
+                    ordersSection.style.display = 'none';
+                }
+                
+                const emptyHTML = `
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No Orders Found</h3>
+                    <p>No orders match your current search criteria.</p>
+                `;
+                
+                if (emptyState) {
+                    emptyState.innerHTML = emptyHTML;
+                    emptyState.style.display = 'block';
+                } else {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-state';
+                    emptyDiv.innerHTML = emptyHTML;
+                    emptyDiv.style.display = 'block';
+                    parentContainer.appendChild(emptyDiv);
+                }
+            }
+            
+            // Update URL without reload
+            const newUrl = new URL(window.location.href.split('?')[0]);
+            if (searchValue) newUrl.searchParams.set('search', searchValue);
+            if (statusValue) newUrl.searchParams.set('status', statusValue);
+            window.history.pushState({}, '', newUrl.toString());
+            
+            hideLoadingState();
+            console.log('AJAX search completed successfully');
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            showErrorMessage('Error searching orders. Please try again.');
+            hideLoadingState();
+        });
+    }
+    
+    // Show loading state
+    function showLoadingState() {
+        // Add loading class to the entire orders section
+        if (ordersSection) {
+            ordersSection.classList.add('loading');
+        }
+        
+        // Disable form controls during search
+        if (searchInput) searchInput.disabled = true;
+        if (statusSelect) statusSelect.disabled = true;
+        
+        // Add loading indicator to search input
+        searchInput.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\'%3E%3Cpath fill=\'%236b7280\' d=\'M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z\'%3E%3CanimateTransform attributeName=\'transform\' dur=\'0.75s\' repeatCount=\'indefinite\' type=\'rotate\' values=\'0 12 12;360 12 12\'/%3E%3C/path%3E%3C/svg%3E")';
+        searchInput.style.backgroundRepeat = 'no-repeat';
+        searchInput.style.backgroundPosition = 'right 12px center';
+        searchInput.style.backgroundSize = '16px';
+        searchInput.style.paddingRight = '40px';
+    }
+    
+    // Hide loading state
+    function hideLoadingState() {
+        // Remove loading class
+        if (ordersSection) {
+            ordersSection.classList.remove('loading');
+        }
+        
+        // Re-enable form controls
+        if (searchInput) {
+            searchInput.disabled = false;
+            searchInput.style.backgroundImage = '';
+            searchInput.style.paddingRight = '';
+        }
+        if (statusSelect) statusSelect.disabled = false;
+        
+        // Remove any loading indicators
+        const loadingIndicator = document.querySelector('.search-loading');
+        if (loadingIndicator) {
+            loadingIndicator.remove();
+        }
+    }
+    
+    // Show error message
+    function showErrorMessage(message) {
+        let errorDiv = document.querySelector('.search-error');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'search-error';
+            errorDiv.style.cssText = `
+                background: #fee2e2;
+                color: #991b1b;
+                padding: 1rem;
+                border-radius: var(--border-radius);
+                margin-top: 1rem;
+                border: 1px solid #fecaca;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            `;
+            filterForm.appendChild(errorDiv);
+        }
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+        errorDiv.style.display = 'flex';
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+        }, 5000);
+    }
+    
+    // Animate stats update
+    function animateStats() {
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach(stat => {
+            stat.style.transform = 'scale(1.1)';
+            stat.style.transition = 'transform 0.3s ease';
+            setTimeout(() => {
+                stat.style.transform = 'scale(1)';
+            }, 300);
+        });
+    }
+    
+    // Bind events to new order elements
+    function bindOrderEvents() {
+        // Re-bind status select events
+        document.querySelectorAll('.select-status').forEach(select => {
+            select.dataset.originalValue = select.value;
+        });
+        
+        // Re-bind table row click events
+        document.querySelectorAll('.table tbody tr').forEach(row => {
+            row.style.cursor = 'pointer';
+        });
+    }
+    
+    // Initial binding
+    bindOrderEvents();
+});
+
 function updateOrderStatus(orderId, newStatus) {
+    // Show loading state
+    const selectElement = event.target;
+    const originalValue = selectElement.dataset.originalValue || selectElement.value;
+    
     if (!confirm('Are you sure you want to update this order status?')) {
-        location.reload(); // Reset the dropdown
+        selectElement.value = originalValue; // Reset to original value
         return;
     }
+
+    // Add loading class
+    selectElement.classList.add('loading');
+    selectElement.disabled = true;
 
     fetch(`/orders/admin/${orderId}/update-status/`, {
         method: 'POST',
@@ -400,23 +1160,215 @@ function updateOrderStatus(orderId, newStatus) {
         },
         body: `status=${newStatus}`
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            location.reload(); // Refresh to show updated status
+            // Show success feedback
+            selectElement.style.backgroundColor = '#d1fae5';
+            selectElement.style.color = '#065f46';
+            
+            // Store the new value as original
+            selectElement.dataset.originalValue = newStatus;
+            
+            // Update the status badge in the same row
+            const row = selectElement.closest('tr') || selectElement.closest('.order-card');
+            const statusBadge = row.querySelector('.status-badge');
+            if (statusBadge) {
+                statusBadge.className = `status-badge status-${newStatus}`;
+                statusBadge.textContent = selectElement.options[selectElement.selectedIndex].text;
+            }
+            
+            // Show success message
+            showSuccessMessage('Order status updated successfully!');
+            
+            // Refresh stats without full page reload
+            refreshStats();
+            
         } else {
-            alert('Error updating order status: ' + data.error);
-            location.reload();
+            throw new Error(data.error || 'Unknown error occurred');
         }
     })
     .catch(error => {
-        alert('Error updating order status');
-        location.reload();
+        console.error('Error updating order status:', error);
+        alert('Error updating order status: ' + (error.message || 'Network error'));
+        selectElement.value = originalValue; // Reset to original value
+    })
+    .finally(() => {
+        // Remove loading state
+        selectElement.classList.remove('loading');
+        selectElement.disabled = false;
+        selectElement.style.backgroundColor = '';
+        selectElement.style.color = '';
     });
 }
-// Auto-refresh every 2 minutes
-setTimeout(function() {
-    location.reload();
-}, 120000);
+
+// Show success message
+function showSuccessMessage(message) {
+    let successDiv = document.querySelector('.status-success');
+    if (!successDiv) {
+        successDiv = document.createElement('div');
+        successDiv.className = 'status-success alert alert-success';
+        successDiv.style.position = 'fixed';
+        successDiv.style.top = '20px';
+        successDiv.style.right = '20px';
+        successDiv.style.zIndex = '9999';
+        successDiv.style.backgroundColor = '#d1fae5';
+        successDiv.style.color = '#065f46';
+        successDiv.style.padding = '1rem';
+        successDiv.style.borderRadius = 'var(--border-radius)';
+        successDiv.style.boxShadow = 'var(--shadow-lg)';
+        document.body.appendChild(successDiv);
+    }
+    successDiv.textContent = message;
+    successDiv.style.display = 'block';
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+        successDiv.style.display = 'none';
+    }, 3000);
+}
+
+// Refresh stats without page reload
+function refreshStats() {
+    fetch(window.location.href + '?ajax=1&stats_only=1', {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newStatsGrid = doc.querySelector('.stats-grid');
+        const statsGrid = document.querySelector('.stats-grid');
+        
+        if (newStatsGrid && statsGrid) {
+            statsGrid.innerHTML = newStatsGrid.innerHTML;
+            // Animate the update
+            const statNumbers = statsGrid.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                stat.style.transform = 'scale(1.1)';
+                stat.style.transition = 'transform 0.3s ease';
+                setTimeout(() => {
+                    stat.style.transform = 'scale(1)';
+                }, 300);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error refreshing stats:', error);
+    });
+}
+
+// Enhanced auto-refresh with better user experience
+let autoRefreshInterval;
+let isUserActive = true;
+let lastActivity = Date.now();
+
+// Track user activity
+document.addEventListener('mousemove', () => {
+    lastActivity = Date.now();
+    isUserActive = true;
+});
+
+document.addEventListener('keypress', () => {
+    lastActivity = Date.now();
+    isUserActive = true;
+});
+
+// Auto-refresh only when user is not actively using the page
+function startAutoRefresh() {
+    autoRefreshInterval = setInterval(() => {
+        // Check if user has been inactive for more than 30 seconds
+        const inactiveTime = Date.now() - lastActivity;
+        if (inactiveTime > 30000) {
+            isUserActive = false;
+        }
+        
+        // Only refresh if user is not actively using the page and not searching
+        if (!isUserActive && !document.querySelector('.loading') && !document.querySelector('.search-loading')) {
+            // Perform AJAX refresh instead of full page reload
+            refreshStats();
+        }
+    }, 120000); // Check every 2 minutes
+}
+
+// Start auto-refresh
+startAutoRefresh();
+
+// Clear interval when page is about to unload
+window.addEventListener('beforeunload', () => {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+});
+
+// Manual refresh button functionality
+function addRefreshButton() {
+    const adminHeader = document.querySelector('.admin-header');
+    if (adminHeader && !document.querySelector('.refresh-btn')) {
+        const refreshBtn = document.createElement('button');
+        refreshBtn.className = 'btn btn-secondary refresh-btn';
+        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+        refreshBtn.style.marginTop = '1rem';
+        refreshBtn.addEventListener('click', () => {
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            location.reload();
+        });
+        adminHeader.appendChild(refreshBtn);
+    }
+}
+
+// Add refresh button
+addRefreshButton();
+
+// Enhanced table interactions
+document.addEventListener('click', function(e) {
+    // Handle table row clicks (except on interactive elements)
+    if (e.target.closest('tr') && !e.target.closest('select, a, button')) {
+        const row = e.target.closest('tr');
+        const viewLink = row.querySelector('a[title="View Order"]');
+        if (viewLink) {
+            window.location.href = viewLink.href;
+        }
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + F to focus search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        const searchInput = document.getElementById('search');
+        if (searchInput) {
+            searchInput.focus();
+            searchInput.select();
+        }
+    }
+    
+    // Escape to clear search
+    if (e.key === 'Escape') {
+        const searchInput = document.getElementById('search');
+        if (searchInput && document.activeElement === searchInput) {
+            searchInput.value = '';
+            searchInput.blur();
+            // Trigger AJAX search to clear results
+            const event = new Event('input');
+            searchInput.dispatchEvent(event);
+        }
+    }
+});
+
+// Store original values for status selects
+document.querySelectorAll('.select-status').forEach(select => {
+    select.dataset.originalValue = select.value;
+});
+
 </script>
 {% endblock %}

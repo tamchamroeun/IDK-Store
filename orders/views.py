@@ -4,10 +4,10 @@ from django.contrib import messages
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_POST
 from django.urls import reverse
-from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
-from .models import Order
+from .models import Order, Product  # Be sure to import Product
 
 @login_required
 def order_list(request):
@@ -48,40 +48,65 @@ def mark_order_delivered(request, order_id):
     messages.success(request, 'Order marked as delivered successfully!')
     return redirect('orders:order_detail', order_id=order_id)
 
-# Admin views
 @login_required
 def admin_order_list(request):
-    """Admin view for listing all orders"""
+    """Admin view for listing all orders with AJAX support"""
     if not request.user.is_staff:
         messages.error(request, 'Access denied. Staff privileges required.')
         return redirect('store:home')
 
     status_filter = request.GET.get('status', '')
     search_query = request.GET.get('search', '')
+    is_ajax = request.GET.get('ajax') == '1' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
-    orders = Order.objects.select_related('user', 'shipping_method') \
+    orders = (
+        Order.objects
+        .select_related('user', 'shipping_method')
         .prefetch_related('order_items__product', 'payment')
+    )
 
     if status_filter:
         orders = orders.filter(status=status_filter)
     if search_query:
         orders = orders.filter(
-            models.Q(order_id__icontains=search_query) |
-            models.Q(user__username__icontains=search_query) |
-            models.Q(user__email__icontains=search_query) |
-            models.Q(user__first_name__icontains=search_query) |
-            models.Q(user__last_name__icontains=search_query)
+            Q(order_id__icontains=search_query) |
+            Q(user__username__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(user__first_name__icontains=search_query) |
+            Q(user__last_name__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(email__icontains=search_query)
         )
 
     orders = orders.order_by('-created_at')
-    if not orders.exists():
-        messages.info(request, 'No orders found matching your criteria.')
+    
+    # Calculate statistics
+    all_orders = Order.objects.all()  # For accurate stats
     context = {
         'orders': orders,
         'status_filter': status_filter,
         'search_query': search_query,
         'order_status_choices': getattr(Order, 'ORDER_STATUS_CHOICES', []),
+        'total_orders': all_orders.count(),
+        'pending_orders': all_orders.filter(status='pending').count(),
+        'confirmed_orders': all_orders.filter(status='confirmed').count(),
+        'processing_orders': all_orders.filter(status='processing').count(),
+        'shipped_orders': all_orders.filter(status='shipped').count(),
+        'delivered_orders': all_orders.filter(status='delivered').count(),
+        'cancelled_orders': all_orders.filter(status='cancelled').count(),
+        'refunded_orders': all_orders.filter(status='refunded').count(),
     }
+
+    # Handle AJAX requests
+    if is_ajax:
+        # Return partial HTML response for AJAX requests
+        return render(request, 'orders/admin/order_list_ajax.html', context)
+    
+    # Add info message for empty results (only for non-AJAX requests)
+    if not orders.exists() and (status_filter or search_query):
+        messages.info(request, 'No orders found matching your criteria.')
+
     return render(request, 'orders/admin/order_list.html', context)
 
 @login_required
@@ -92,7 +117,7 @@ def admin_order_detail(request, order_id):
         return redirect('store:home')
 
     order = get_object_or_404(
-        Order.objects.select_related('user', 'payment')  # Removed 'shipping_method'
+        Order.objects.select_related('user', 'payment')
               .prefetch_related('order_items__product'),
         order_id=order_id
     )
@@ -148,11 +173,12 @@ def update_order_status(request, order_id):
 
 @login_required
 def admin_dashboard(request):
-    """Admin dashboard with order statistics"""
+    """Admin dashboard with order statistics and product stats"""
     if not request.user.is_staff:
         messages.error(request, 'Access denied. Staff privileges required.')
         return redirect('store:home')
 
+    # Order stats
     total_orders = Order.objects.count()
     pending_orders = Order.objects.filter(status='pending').count()
     confirmed_orders = Order.objects.filter(status='confirmed').count()
@@ -161,6 +187,13 @@ def admin_dashboard(request):
 
     recent_orders = Order.objects.select_related('user').order_by('-created_at')[:5]
 
+    # Product stats (this is the fix for your dashboard!)
+    products = Product.objects.all()
+    total_products = products.count()
+    in_stock = products.filter(quantity__gt=0).count()
+    low_stock = products.filter(quantity__gt=0, quantity__lt=5).count()
+    out_stock = products.filter(quantity=0).count()
+
     context = {
         'total_orders': total_orders,
         'pending_orders': pending_orders,
@@ -168,8 +201,15 @@ def admin_dashboard(request):
         'shipped_orders': shipped_orders,
         'delivered_orders': delivered_orders,
         'recent_orders': recent_orders,
+
+        # Product stats for dashboard template!
+        'products': products,
+        'total_products': total_products,
+        'in_stock': in_stock,
+        'low_stock': low_stock,
+        'out_stock': out_stock,
     }
-    return render(request, 'orders/admin/dashboard.html', context)
+    return render(request, 'store/dashboard.html', context)
 
 @login_required
 def get_pending_orders_count(request):

@@ -7,6 +7,7 @@ urlpatterns = [
     # Checkout and payment
     path('checkout/', views.checkout, name='checkout'),      
     path('apply-coupon/submit/', views.apply_coupon, name='apply_coupon'),
+    path('calculate-totals/', views.calculate_order_totals, name='calculate_order_totals'),
     path('payment/process/<uuid:order_id>/', views.payment_process, name='payment_process'),
     path('payment/callback/', views.payment_callback, name='payment_callback'),
     
@@ -24,4 +25,7 @@ urlpatterns = [
     path('admin/order/<uuid:order_id>/', views.admin_order_detail, name='admin_order_detail'),
     path('admin/order/<uuid:order_id>/update-status/', views.admin_update_order_status, name='admin_update_order_status'),
     path('admin/orders/bulk-update/', views.admin_bulk_update_orders, name='admin_bulk_update_orders'),
+    
+    # Debug
+    path('debug-shipping/', views.debug_shipping, name='debug_shipping'),
 ]

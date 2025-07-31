@@ -5,139 +5,380 @@
 
 {% block extra_css %}
 <style>
+:root {
+    --primary-color: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #a5b4fc;
+    --secondary-color: #f1f5f9;
+    --success-color: #10b981;
+    --success-dark: #059669;
+    --warning-color: #f59e0b;
+    --warning-light: #fde68a;
+    --danger-color: #ef4444;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+    min-height: 100vh;
+}
+
 .payment-container {
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 2rem 1rem;
     text-align: center;
+    position: relative;
+}
+
+@media (min-width: 768px) {
+    .payment-container {
+        padding: 3rem 2rem;
+    }
 }
 
 .payment-header {
-    background: linear-gradient(135deg, #ffc107, #ff8f00);
-    color: white;
-    border-radius: 8px;
-    padding: 30px;
-    margin-bottom: 30px;
+    background: linear-gradient(135deg, var(--warning-color) 0%, #ff8f00 100%);
+    color: var(--white);
+    border-radius: var(--radius-2xl);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.payment-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
 }
 
 .payment-title {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-size: clamp(1.875rem, 5vw, 2.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
 }
 
 .payment-subtitle {
-    font-size: 1.1rem;
-    opacity: 0.9;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+    font-weight: 600;
 }
 
 .payment-info {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    padding: 30px;
-    margin-bottom: 30px;
+    background: var(--white);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.payment-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
 }
 
 .order-details {
-    background: #f8f9fa;
-    border-radius: 4px;
-    padding: 20px;
-    margin: 20px 0;
+    background: var(--gray-50);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    margin: 2rem 0;
     text-align: left;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.order-details:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.order-details h4 {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .detail-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
-    padding: 5px 0;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .detail-label {
     font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
 }
 
 .payment-method-info {
-    background: #e3f2fd;
-    border-left: 4px solid #2196f3;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 0 4px 4px 0;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-left: 4px solid var(--primary-color);
+    padding: 2rem;
+    margin: 2rem 0;
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.payment-method-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(30px, -30px);
+}
+
+.payment-method-info h4 {
+    color: var(--primary-color);
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.payment-method-info p {
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.payment-method-info strong {
+    color: var(--text-primary);
 }
 
 .status-indicator {
-    font-size: 3rem;
-    margin: 20px 0;
+    font-size: 4rem;
+    margin: 2rem 0;
+    transition: var(--transition);
 }
 
 .status-pending {
-    color: #ffc107;
-    animation: pulse 2s infinite;
+    color: var(--warning-color);
+    animation: pulse 2s infinite, rotate 4s linear infinite;
 }
 
 .status-completed {
-    color: #28a745;
+    color: var(--success-color);
+    animation: bounceIn 0.8s ease-in-out;
 }
 
 .status-failed {
-    color: #dc3545;
+    color: var(--danger-color);
+    animation: shake 0.5s ease-in-out;
 }
 
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
 }
 
 .instructions {
-    background: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 4px;
-    padding: 20px;
-    margin: 20px 0;
+    background: linear-gradient(135deg, var(--warning-light) 0%, #fef3c7 100%);
+    border: 1px solid var(--warning-color);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    margin: 2rem 0;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.instructions::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--warning-color);
+}
+
+.instructions h4 {
+    color: var(--warning-color);
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.instructions p {
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+}
+
+.instructions strong {
+    color: var(--text-primary);
 }
 
 .btn {
-    padding: 12px 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
     border: none;
-    border-radius: 4px;
-    font-size: 14px;
+    border-radius: 9999px;
+    font-size: 1rem;
+    font-weight: 600;
     text-decoration: none;
-    display: inline-block;
-    margin: 5px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0.5rem;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
 }
 
 .btn-primary {
-    background-color: #007bff;
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: var(--white);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
-    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: var(--white);
 }
 
 .btn-success {
-    background-color: #28a745;
-    color: white;
+    background: linear-gradient(135deg, var(--success-color), var(--success-dark));
+    color: var(--white);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-success:hover {
-    background-color: #1e7e34;
-    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: var(--white);
 }
 
 .loading-spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #007bff;
+    border: 4px solid var(--gray-100);
+    border-top: 4px solid var(--primary-color);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     animation: spin 1s linear infinite;
-    margin: 20px auto;
+    margin: 2rem auto;
+    position: relative;
+}
+
+.loading-spinner::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes spin {
@@ -145,19 +386,240 @@
     100% { transform: rotate(360deg); }
 }
 
-@media (max-width: 768px) {
+.action-buttons {
+    margin-top: 3rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.help-section {
+    margin-top: 3rem;
+    text-align: center;
+    padding: 2rem;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.help-section p {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.help-section a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.help-section a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 640px) {
     .payment-container {
-        padding: 20px 10px;
+        padding: 1rem 0.5rem;
+    }
+    
+    .payment-header {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
     }
     
     .payment-info {
-        padding: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .order-details,
+    .payment-method-info,
+    .instructions {
+        padding: 1.5rem;
+        margin: 1.5rem 0;
     }
     
     .detail-row {
         flex-direction: column;
-        gap: 5px;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem 0;
     }
+    
+    .detail-value {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .status-indicator {
+        font-size: 3rem;
+        margin: 1.5rem 0;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        justify-content: center;
+        padding: 1rem 2rem;
+        font-size: 1.125rem;
+        margin: 0;
+    }
+    
+    .help-section {
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .payment-method-info p,
+    .instructions p {
+        font-size: 0.875rem;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+    .detail-row {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .action-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .payment-container {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (min-width: 1025px) {
+    .payment-info:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+    }
+    
+    .action-buttons {
+        justify-content: center;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.loading .payment-info {
+    animation: pulse 2s infinite;
+}
+
+/* Focus styles for accessibility */
+.btn:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.payment-info:focus-within {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .action-buttons,
+    .help-section,
+    .payment-header::before,
+    .loading-spinner {
+        display: none !important;
+    }
+    
+    .payment-info {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .payment-header {
+        background: none !important;
+        color: #000 !important;
+    }
+    
+    .status-indicator {
+        color: #000 !important;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --white: #1e293b;
+        --gray-50: #334155;
+        --gray-100: #475569;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #475569;
+    }
+}
+
+/* Enhanced animations */
+.payment-container > * {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.payment-container > *:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.payment-container > *:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Status-specific styling */
+.status-success h3 {
+    color: var(--success-color);
+}
+
+.status-pending h3 {
+    color: var(--warning-color);
+}
+
+.status-failed h3 {
+    color: var(--danger-color);
+}
+
+/* Progressive enhancement */
+.enhanced-card {
+    transition: var(--transition);
+}
+
+.enhanced-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 </style>
 {% endblock %}
@@ -195,25 +657,25 @@
             <h4>Order Summary</h4>
             <div class="detail-row">
                 <span class="detail-label">Order ID:</span>
-                <span>{{ order.order_id }}</span>
+                <span class="detail-value">{{ order.order_id }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Total Amount:</span>
-                <span>${{ order.grand_total }}</span>
+                <span class="detail-value">${{ order.grand_total }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Payment Method:</span>
-                <span>{{ payment.get_payment_method_display }}</span>
+                <span class="detail-value">{{ payment.get_payment_method_display }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Payment Status:</span>
-                <span>{{ payment.get_status_display }}</span>
+                <span class="detail-value">{{ payment.get_status_display }}</span>
             </div>
         </div>
         
         {% if payment.payment_method == 'bank_transfer' %}
         <div class="payment-method-info">
-            <h4><i class="fas fa-university me-2"></i>Bank Transfer Instructions</h4>
+            <h4><i class="fas fa-university"></i>Bank Transfer Instructions</h4>
             <p><strong>Bank:</strong> ABC Bank</p>
             <p><strong>Account Name:</strong> MyEcommerce Ltd.</p>
             <p><strong>Account Number:</strong> 1234567890</p>
@@ -224,7 +686,7 @@
         </div>
         {% elif payment.payment_method == 'aba_pay' %}
         <div class="payment-method-info">
-            <h4><i class="fas fa-mobile-alt me-2"></i>ABA Pay Instructions</h4>
+            <h4><i class="fas fa-mobile-alt"></i>ABA Pay Instructions</h4>
             <p>1. Open your ABA Mobile app</p>
             <p>2. Scan the QR code below or use account: <strong>012345678</strong></p>
             <p>3. Enter amount: <strong>${{ order.grand_total }}</strong></p>
@@ -232,7 +694,7 @@
         </div>
         {% elif payment.payment_method == 'wing' %}
         <div class="payment-method-info">
-            <h4><i class="fas fa-mobile-alt me-2"></i>Wing Instructions</h4>
+            <h4><i class="fas fa-mobile-alt"></i>Wing Instructions</h4>
             <p>1. Dial *247# or use Wing app</p>
             <p>2. Send money to: <strong>012345678</strong></p>
             <p>3. Enter amount: <strong>${{ order.grand_total }}</strong></p>
@@ -240,7 +702,7 @@
         </div>
         {% elif payment.payment_method == 'cash_on_delivery' %}
         <div class="instructions">
-            <h4><i class="fas fa-truck me-2"></i>Cash on Delivery</h4>
+            <h4><i class="fas fa-truck"></i>Cash on Delivery</h4>
             <p>You have selected Cash on Delivery. Please have the exact amount ready when the delivery person arrives.</p>
             <p><strong>Amount to pay:</strong> ${{ order.grand_total }}</p>
         </div>
@@ -253,30 +715,30 @@
         </div>
         {% endif %}
         
-        <div style="margin-top: 30px;">
+        <div class="action-buttons">
             {% if payment.status == 'completed' %}
                 <a href="{% url 'payment:order_success' order.order_id %}" class="btn btn-success">
-                    <i class="fas fa-check me-2"></i>View Order Confirmation
+                    <i class="fas fa-check"></i>View Order Confirmation
                 </a>
             {% elif payment.status == 'failed' %}
                 <a href="{% url 'payment:checkout' %}" class="btn btn-primary">
-                    <i class="fas fa-redo me-2"></i>Try Again
+                    <i class="fas fa-redo"></i>Try Again
                 </a>
             {% else %}
                 <a href="{% url 'payment:order_detail' order.order_id %}" class="btn btn-primary">
-                    <i class="fas fa-eye me-2"></i>View Order Details
+                    <i class="fas fa-eye"></i>View Order Details
                 </a>
             {% endif %}
             
             <a href="{% url 'payment:order_tracking' order.order_id %}" class="btn btn-primary">
-                <i class="fas fa-truck me-2"></i>Track Order
+                <i class="fas fa-truck"></i>Track Order
             </a>
         </div>
     </div>
     
-    <div style="margin-top: 30px;">
-        <p class="text-muted">
-            <i class="fas fa-question-circle me-2"></i>
+    <div class="help-section">
+        <p>
+            <i class="fas fa-question-circle"></i>
             Need help? <a href="#" class="text-primary">Contact our support team</a>
         </p>
     </div>
@@ -290,4 +752,327 @@ setTimeout(function() {
 }, 5000);
 </script>
 {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const isMobile = window.innerWidth <= 768;
+    
+    // Enhanced status animations
+    const statusIndicator = document.querySelector('.status-indicator');
+    const paymentStatus = '{{ payment.status }}';
+    
+    // Add appropriate CSS classes for styling
+    if (statusIndicator) {
+        statusIndicator.parentElement.classList.add(`status-${paymentStatus}`);
+    }
+    
+    // Intersection Observer for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const animationObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 150);
+            }
+        });
+    }, observerOptions);
+    
+    // Animate payment info sections
+    const animatedElements = document.querySelectorAll('.payment-info, .order-details, .payment-method-info, .instructions, .action-buttons');
+    animatedElements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        animationObserver.observe(element);
+    });
+    
+    // Button ripple effects
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(255, 255, 255, 0.6);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s ease-out;
+                pointer-events: none;
+            `;
+            
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+    
+    // Copy order ID functionality
+    const orderIdElements = document.querySelectorAll('.detail-value');
+    orderIdElements.forEach(element => {
+        if (element.textContent.includes('{{ order.order_id }}')) {
+            element.style.cursor = 'pointer';
+            element.title = 'Click to copy order ID';
+            
+            element.addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText('{{ order.order_id }}');
+                    showNotification('Order ID copied to clipboard!', 'success');
+                } catch (err) {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = '{{ order.order_id }}';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showNotification('Order ID copied to clipboard!', 'success');
+                }
+            });
+        }
+    });
+    
+    // Enhanced mobile interactions
+    if (isMobile) {
+        // Touch feedback for info cards
+        const infoCards = document.querySelectorAll('.order-details, .payment-method-info, .instructions');
+        infoCards.forEach(card => {
+            card.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            card.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+        
+        // Pull to refresh functionality
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+        
+        document.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            isDragging = true;
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+            
+            if (deltaY > 100 && window.scrollY === 0) {
+                document.body.style.transform = `translateY(${deltaY * 0.3}px)`;
+                document.body.style.opacity = `${1 - (deltaY * 0.002)}`;
+            }
+        });
+        
+        document.addEventListener('touchend', () => {
+            if (isDragging) {
+                const deltaY = currentY - startY;
+                if (deltaY > 150 && window.scrollY === 0) {
+                    location.reload();
+                } else {
+                    document.body.style.transform = '';
+                    document.body.style.opacity = '';
+                }
+                isDragging = false;
+            }
+        });
+    }
+    
+    // Auto-redirect for completed payments
+    if (paymentStatus === 'completed') {
+        setTimeout(() => {
+            if (confirm('Payment successful! Would you like to view your order confirmation now?')) {
+                const successButton = document.querySelector('.btn-success');
+                if (successButton) {
+                    successButton.click();
+                }
+            }
+        }, 3000);
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case 'r':
+                    e.preventDefault();
+                    location.reload();
+                    break;
+                case 'p':
+                    e.preventDefault();
+                    window.print();
+                    break;
+                case 'd':
+                    e.preventDefault();
+                    const detailsBtn = document.querySelector('.btn-primary');
+                    if (detailsBtn) detailsBtn.click();
+                    break;
+                case 't':
+                    e.preventDefault();
+                    const trackBtn = document.querySelector('.btn-primary:last-child');
+                    if (trackBtn) trackBtn.click();
+                    break;
+            }
+        }
+    });
+    
+    // Enhanced loading spinner for pending payments
+    if (paymentStatus === 'pending') {
+        const spinner = document.querySelector('.loading-spinner');
+        if (spinner) {
+            // Add more visual feedback
+            spinner.addEventListener('click', () => {
+                showNotification('Payment is being processed, please wait...', 'info');
+            });
+            
+            // Progress simulation
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 90) {
+                    progress = 90;
+                    clearInterval(progressInterval);
+                }
+                
+                // Update spinner color based on progress
+                const hue = (progress / 100) * 120; // 0 (red) to 120 (green)
+                spinner.style.borderTopColor = `hsl(${hue}, 70%, 50%)`;
+            }, 500);
+        }
+    }
+    
+    // Payment method info enhancement
+    const paymentMethodInfo = document.querySelector('.payment-method-info');
+    if (paymentMethodInfo) {
+        paymentMethodInfo.classList.add('enhanced-card');
+        
+        // Add copy functionality for payment details
+        const strongElements = paymentMethodInfo.querySelectorAll('strong');
+        strongElements.forEach(element => {
+            if (element.textContent.match(/\d+/)) { // If contains numbers
+                element.style.cursor = 'pointer';
+                element.title = 'Click to copy';
+                
+                element.addEventListener('click', async function() {
+                    try {
+                        await navigator.clipboard.writeText(this.textContent);
+                        showNotification('Copied to clipboard!', 'success');
+                    } catch (err) {
+                        showNotification('Could not copy to clipboard', 'error');
+                    }
+                });
+            }
+        });
+    }
+    
+    // Notification function
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        const colors = {
+            success: 'var(--success-color)',
+            error: 'var(--danger-color)',
+            info: 'var(--primary-color)'
+        };
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${colors[type] || colors.info};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            animation: slideInRight 0.3s ease;
+            font-weight: 500;
+            max-width: 300px;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+    
+    // Auto-refresh countdown for pending payments
+    if (paymentStatus === 'pending' && '{{ payment.payment_method }}' !== 'cash_on_delivery') {
+        let countdown = 30;
+        const countdownElement = document.createElement('div');
+        countdownElement.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--warning-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 600;
+            z-index: 1000;
+        `;
+        
+        const updateCountdown = () => {
+            countdownElement.textContent = `Auto-refresh in ${countdown}s`;
+            countdown--;
+            
+            if (countdown < 0) {
+                location.reload();
+            }
+        };
+        
+        document.body.appendChild(countdownElement);
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    }
+});
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes ripple {
+        to { transform: scale(2); opacity: 0; }
+    }
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+// Service worker registration for offline support
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/sw.js')
+            .then(registration => {
+                console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+    });
+}
+</script>
 {% endblock %}

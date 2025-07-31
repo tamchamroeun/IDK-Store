@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sales Report PDF</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 1cm; }
+        h1, h2 { color: #333; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 1em;}
+        th, td { border: 1px solid #999; padding: 0.4em; }
+        th { background: #eee; }
+    </style>
+</head>
+<body>
+    <h1>Sales Report</h1>
+    <p>Period: {{ report_data.start_date }} to {{ report_data.end_date }}</p>
+    <h2>Summary</h2>
+    <table>
+        <tr>
+            <th>Total Orders</th>
+            <th>Total Revenue</th>
+            <th>Average Order Value</th>
+            <th>Items Sold</th>
+        </tr>
+        <tr>
+            <td>{{ report_data.total_orders }}</td>
+            <td>${{ report_data.total_revenue|floatformat:2 }}</td>
+            <td>${{ report_data.average_order_value|floatformat:2 }}</td>
+            <td>{{ report_data.total_items_sold }}</td>
+        </tr>
+    </table>
+
+    <h2>Order Status Breakdown</h2>
+    <table>
+        <tr>
+            <th>Status</th>
+            <th>Count</th>
+            <th>Revenue</th>
+        </tr>
+        {% for status in report_data.status_breakdown %}
+        <tr>
+            <td>{{ status.status|capfirst }}</td>
+            <td>{{ status.count }}</td>
+            <td>${{ status.revenue|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Daily Sales</h2>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Orders</th>
+            <th>Revenue</th>
+        </tr>
+        {% for day in report_data.daily_sales %}
+        <tr>
+            <td>{{ day.day }}</td>
+            <td>{{ day.orders_count }}</td>
+            <td>${{ day.revenue|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

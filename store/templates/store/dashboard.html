@@ -1,600 +1,471 @@
 {% extends 'store/base.html' %}
+{% load static %}
 
-{% block title %}Dashboard - E-commerce App{% endblock %}
+{% block meta_description %}Manage your store products, inventory, and categories from the dashboard. Add, edit, and delete products easily.{% endblock %}
+{% block title %}Dashboard - IDK Store{% endblock %}
 
 {% block extra_css %}
 <style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
     .dashboard-header {
         text-align: center;
-        margin-bottom: 2rem;
-        padding: 1rem 0;
+        margin-bottom: 2.5rem;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        border-radius: var(--border-radius-lg, 16px);
+        border: 1px solid rgba(99, 102, 241, 0.1);
     }
-    
     .dashboard-title {
-        font-size: 2.5rem;
-        color: var(--primary);
-        margin-bottom: 1.5rem;
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        color: var(--primary, #6133ea);
+        margin-bottom: 1rem;
         font-weight: 700;
+        letter-spacing: -0.025em;
     }
-    
+    .dashboard-subtitle {
+        color: #888;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        opacity: 0.8;
+    }
     .dashboard-actions {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
         gap: 1rem;
-        margin-bottom: 2rem;
-        padding: 0 1rem;
+        margin-bottom: 0;
     }
-    
     .btn {
-        padding: 12px 24px;
-        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--border-radius, 14px);
         text-decoration: none;
         font-weight: 600;
         font-size: 0.95rem;
-        display: inline-block;
-        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
         border: none;
         cursor: pointer;
         text-align: center;
         min-width: 140px;
+        justify-content: center;
+        white-space: nowrap;
+        box-shadow: 0 2px 16px rgba(80, 68, 196, 0.08);
+        min-height: 44px;
     }
-    
     .btn-primary {
-        background: var(--primary);
-        color: white;
+        background: var(--primary, #6133ea);
+        color: #fff;
     }
-    
     .btn-primary:hover {
-        background: var(--primary-hover);
-        color: white;
+        background: var(--primary-hover, #4b25be);
+        color: #fff;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(97, 51, 234, 0.3);
+        box-shadow: 0 6px 20px rgba(97, 51, 234, 0.4);
     }
-    
     .btn-danger {
-        background: var(--danger);
-        color: white;
+        background: var(--danger, #dc3545);
+        color: #fff;
     }
-    
     .btn-danger:hover {
-        background: var(--danger-hover);
-        color: white;
+        background: #c82333;
+        color: #fff;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        box-shadow: 0 10px 15px -3px rgb(239 68 68 / 0.3);
     }
-    
+    .btn-secondary {
+        background: #f5f5f5;
+        color: #23272f;
+        border: 1px solid #e5e7eb;
+    }
+    .btn-secondary:hover {
+        background: #e5e7eb;
+        transform: translateY(-2px);
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .stat-card {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: var(--border-radius-lg, 16px);
+        box-shadow: 0 2px 16px rgba(80, 68, 196, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(80, 68, 196, 0.15);
+    }
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem auto;
+    }
+    .stat-icon.primary { background: rgba(99, 102, 241, 0.1); color: var(--primary, #6133ea); }
+    .stat-icon.success { background: rgba(16, 185, 129, 0.1); color: #10b981;}
+    .stat-icon.warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b;}
+    .stat-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger, #dc3545);}
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #23272f;
+        margin-bottom: 0.25rem;
+        text-align: center;
+    }
+    .stat-label {
+        color: #888;
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-align: center;
+    }
+  
+    .products-section {
+        margin-top: 2rem;
+    }
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #23272f;
+        margin: 0;
+    }
     .product-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1.5rem;
+        margin-top: 1.5rem;
         padding: 0;
-        margin: 0;
     }
-    
-    /* Flexbox fallback for older browsers */
-    @supports not (display: grid) {
-        .product-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .product-card {
-            width: 300px;
-            margin: 0.75rem;
-        }
-    }
-    
     .product-card {
-        background: var(--background-card);
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
+        background: #fff;
+        border-radius: var(--border-radius-lg, 16px);
+        box-shadow: 0 2px 16px rgba(80, 68, 196, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
         overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: all 0.2s ease;
         height: fit-content;
     }
-    
     .product-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 25px rgba(80, 68, 196, 0.15);
     }
-    
     .product-link {
         text-decoration: none;
         color: inherit;
         display: block;
     }
-    
     .product-image {
         width: 100%;
-        height: 220px;
+        height: 200px;
         object-fit: cover;
-        border-bottom: 1px solid #f1f0fa;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
-    
     .product-image-placeholder {
         width: 100%;
-        height: 220px;
-        background-color: #f8f9fa;
+        height: 200px;
+        background: #f8f9fa;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #6c757d;
+        color: #aaa;
         font-size: 1rem;
-        border-bottom: 1px solid #f1f0fa;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        font-weight: 500;
     }
-    
     .product-info {
-        padding: 1.25rem;
+        padding: 1.5rem;
     }
-    
     .product-name {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        color: var(--text-dark);
+        color: #23272f;
         margin-bottom: 0.75rem;
         line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
-    
-    .product-meta-row {
+    .product-meta {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 0.75rem;
+        margin-bottom: 1rem;
         flex-wrap: wrap;
         gap: 0.5rem;
     }
-    
     .product-price {
-        font-size: 1.3rem;
+        font-size: 1.25rem;
         font-weight: 700;
-        color: var(--primary);
+        color: var(--primary, #6133ea);
     }
-    
-    .product-quantity {
+    .product-stock {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 0.9rem;
         font-weight: 500;
     }
-    
-    .stock-status {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.8rem;
+    .stock-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
         font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
     }
-    
     .stock-out {
-        background: #fee;
-        color: #dc3545;
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger, #dc3545);
     }
-    
     .stock-low {
-        background: #fff3cd;
-        color: #856404;
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
     }
-    
     .stock-in {
-        background: #d4edda;
-        color: #155724;
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
     }
-    
     .product-description {
-        font-size: 0.95rem;
-        color: #666;
+        font-size: 0.9rem;
+        color: #888;
         line-height: 1.5;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
-    
-    .button-group {
+    .product-actions {
         display: flex;
         gap: 0.75rem;
-        margin-top: 1rem;
     }
-    
-    .button-group .btn {
+    .product-actions .btn {
         flex: 1;
         min-width: auto;
-        padding: 10px 16px;
-        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        min-height: 40px;
     }
-    
     .empty-state {
         text-align: center;
-        padding: 4rem 1rem;
-        color: #6c757d;
+        padding: 4rem 2rem;
+        background: #fff;
+        border-radius: var(--border-radius-lg, 16px);
+        box-shadow: 0 2px 16px rgba(80, 68, 196, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
     }
-    
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: var(--primary, #6133ea);
+    }
     .empty-state h3 {
         font-size: 1.5rem;
         margin-bottom: 1rem;
-        color: var(--text-main);
+        color: #23272f;
+        font-weight: 600;
     }
-    
     .empty-state p {
-        font-size: 1.1rem;
+        font-size: 1rem;
         margin-bottom: 2rem;
+        color: #888;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
     }
-    
-    /* Safari iOS specific fixes */
-    .btn {
-        -webkit-appearance: none;
-        appearance: none;
-        -webkit-border-radius: 50px;
-        border-radius: 50px;
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-        backface-visibility: hidden;
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    .product-card {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-        backface-visibility: hidden;
-    }
-    
-    /* Chrome mobile specific optimizations */
-    .product-grid {
-        scroll-behavior: smooth;
-    }
-    
-    .product-image {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-    }
-    
-    /* Touch device optimizations */
-    @media (hover: none) and (pointer: coarse) {
-        .btn {
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .product-card:hover {
-            transform: none;
-        }
-        
-        .btn:active {
-            transform: scale(0.98);
-            transition: transform 0.1s ease;
-        }
-        
-        .product-link {
-            -webkit-tap-highlight-color: transparent;
-        }
-    }
-    
-    /* Desktop and Large Screens */
-    @media (min-width: 1200px) {
-        .product-grid {
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        }
-        
-        .dashboard-actions {
-            gap: 1.5rem;
-        }
-        
-        .btn {
-            min-width: 160px;
-            padding: 14px 28px;
-        }
-    }
-    
-    /* Tablet Responsiveness */
-    @media (max-width: 900px) {
-        .dashboard-title {
-            font-size: 2.2rem;
-        }
-        
-        .product-grid {
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.25rem;
-        }
-        
-        .dashboard-actions {
-            gap: 0.75rem;
-        }
-        
-        .btn {
-            min-width: 120px;
-            padding: 10px 20px;
-            font-size: 0.9rem;
-        }
-    }
-    
-    /* Mobile Responsiveness */
     @media (max-width: 768px) {
-        .dashboard-title {
-            font-size: 2rem;
-        }
-        
-        .dashboard-actions {
-            flex-direction: column;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0 0.5rem;
-        }
-        
-        .btn {
-            width: 100%;
-            max-width: 280px;
-            min-width: auto;
-        }
-        
-        .product-grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        
-        .product-image,
-        .product-image-placeholder {
-            height: 180px;
-        }
-        
-        .product-info {
-            padding: 1rem;
-        }
-        
-        .product-name {
-            font-size: 1.1rem;
-        }
-        
-        .product-meta-row {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-        
-        .product-price {
-            font-size: 1.2rem;
-        }
-        
-        .button-group {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .button-group .btn {
-            width: 100%;
-        }
+        .dashboard-container { padding: 0.5rem; }
+        .dashboard-header { padding: 1.5rem 1rem; margin-bottom: 2rem; }
+        .dashboard-actions { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+        .btn { width: 100%; max-width: none; }
+        .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .stat-card { padding: 1.25rem; }
+        .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .product-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        .product-image, .product-image-placeholder { height: 180px; }
+        .product-info { padding: 1.25rem; }
+        .product-actions { flex-direction: column; gap: 0.5rem; }
+        .empty-state { padding: 3rem 1.5rem; }
+        .empty-state-icon { width: 60px; height: 60px; font-size: 1.5rem; }
     }
-    
-    /* iPhone and Android Phone Optimization */
-    @media (max-width: 600px) {
-        .dashboard-header {
-            padding: 0.5rem 0;
-            margin-bottom: 1.5rem;
-        }
-        
-        .dashboard-title {
-            font-size: 1.8rem;
-        }
-        
-        .product-grid {
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-        
-        .product-card {
-            max-width: 100%;
-        }
-        
-        .product-quantity {
-            font-size: 0.85rem;
-        }
-        
-        .stock-status {
-            font-size: 0.75rem;
-            padding: 2px 6px;
-        }
-    }
-    
-    /* Small Mobile */
     @media (max-width: 480px) {
-        .dashboard-title {
-            font-size: 1.7rem;
-        }
-        
-        .product-grid {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-        
-        .product-card {
-            margin: 0 auto;
-            max-width: 100%;
-        }
-        
-        .product-image,
-        .product-image-placeholder {
-            height: 200px;
-        }
-        
-        .product-info {
-            padding: 0.875rem;
-        }
-        
-        .product-name {
-            font-size: 1rem;
-        }
-        
-        .product-price {
-            font-size: 1.1rem;
-        }
-        
-        .empty-state {
-            padding: 3rem 1rem;
-        }
-        
-        .empty-state h3 {
-            font-size: 1.3rem;
-        }
-        
-        .empty-state p {
-            font-size: 1rem;
-        }
-    }
-    
-    /* Very Small Mobile */
-    @media (max-width: 320px) {
-        .dashboard-title {
-            font-size: 1.5rem;
-        }
-        
-        .dashboard-header {
-            padding: 0.25rem 0;
-            margin-bottom: 1rem;
-        }
-        
-        .dashboard-actions {
-            padding: 0 0.25rem;
-        }
-        
-        .product-grid {
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-        }
-        
-        .product-image,
-        .product-image-placeholder {
-            height: 160px;
-        }
-        
-        .product-info {
-            padding: 0.75rem;
-        }
-        
-        .product-name {
-            font-size: 0.95rem;
-        }
-        
-        .product-price {
-            font-size: 1rem;
-        }
-        
-        .btn {
-            padding: 8px 16px;
-            font-size: 0.85rem;
-        }
-        
-        .button-group .btn {
-            padding: 8px 12px;
-        }
-        
-        .empty-state {
-            padding: 2rem 0.5rem;
-        }
-        
-        .empty-state h3 {
-            font-size: 1.2rem;
-        }
-        
-        .empty-state p {
-            font-size: 0.9rem;
-        }
-    }
-    
-    /* Landscape phone orientation */
-    @media (max-height: 500px) and (orientation: landscape) {
-        .dashboard-header {
-            padding: 0.5rem 0;
-            margin-bottom: 1rem;
-        }
-        
-        .dashboard-title {
-            font-size: 1.8rem;
-        }
-        
-        .product-grid {
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 0.75rem;
-        }
-        
-        .product-image,
-        .product-image-placeholder {
-            height: 140px;
-        }
-        
-        .product-info {
-            padding: 0.75rem;
-        }
-        
-        .empty-state {
-            padding: 2rem 1rem;
-        }
-    }
-    
-    /* High DPI screens (Retina displays) */
-    @media (-webkit-min-device-pixel-ratio: 2),
-           (min-resolution: 192dpi) {
-        .product-image {
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
-        }
+        .dashboard-container { padding: 0.25rem; }
+        .dashboard-header { padding: 1rem 0.75rem; }
+        .stats-grid { grid-template-columns: 1fr; }
+        .product-grid { grid-template-columns: 1fr; gap: 1rem; }
+        .product-image, .product-image-placeholder { height: 160px; }
+        .product-info { padding: 1rem; }
+        .product-name { font-size: 1rem; }
+        .product-price { font-size: 1.1rem; }
+        .empty-state { padding: 2rem 1rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <h1 class="dashboard-title">Product Dashboard</h1>
-    <div class="dashboard-actions">
-        <a href="{% url 'products:add_product' %}" class="btn btn-primary">Add New Product</a>
-        <a href="{% url 'products:add_category' %}" class="btn btn-primary">Add New Category</a>
-        <a href="{% url 'products:product_management' %}" class="btn btn-primary">Product Management</a>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Product Dashboard</h1>
+        <p class="dashboard-subtitle">Manage your store inventory and products</p>
+        <div class="dashboard-actions">
+            <a href="{% url 'products:add_product' %}" class="btn btn-primary">
+                <i class="fa fa-plus"></i>
+                Add Product
+            </a>
+            <a href="{% url 'products:add_category' %}" class="btn btn-primary">
+                <i class="fa fa-tags"></i>
+                Add Category
+            </a>
+            <a href="{% url 'products:product_management' %}" class="btn btn-secondary">
+                <i class="fa fa-cog"></i>
+                Manage Products
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fa fa-box"></i>
+            </div>
+            <div class="stat-value">{{ products|length }}</div>
+            <div class="stat-label">Total Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fa fa-check-circle"></i>
+            </div>
+            <div class="stat-value">
+                {{ in_stock }}
+            </div>
+            <div class="stat-label">In Stock</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fa fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-value">
+                {{ low_stock }}
+            </div>
+            <div class="stat-label">Low Stock</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon danger">
+                <i class="fa fa-times-circle"></i>
+            </div>
+            <div class="stat-value">
+                {{ out_stock }}
+            </div>
+            <div class="stat-label">Out of Stock</div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="products-section">
+        <div class="section-header">
+            <h2 class="section-title">Your Products</h2>
+            {% if products %}
+            <div class="section-actions">
+                <a href="{% url 'products:add_product' %}" class="btn btn-primary">
+                    <i class="fa fa-plus"></i>
+                    Add New
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if products %}
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    <a href="{% url 'products:product_detail' product.id %}" class="product-link">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                        {% else %}
+                            <div class="product-image-placeholder">
+                                <i class="fa fa-image"></i>
+                                <span>No Image</span>
+                            </div>
+                        {% endif %}
+                    </a>
+                    <div class="product-info">
+                        <h3 class="product-name">{{ product.name }}</h3>
+                        <div class="product-meta">
+                            <span class="product-price">${{ product.price }}</span>
+                            <div class="product-stock">
+                                <span>{{ product.quantity }} units</span>
+                                {% if product.quantity == 0 %}
+                                    <span class="stock-badge stock-out">Out of Stock</span>
+                                {% elif product.quantity < 5 %}
+                                    <span class="stock-badge stock-low">Low Stock</span>
+                                {% else %}
+                                    <span class="stock-badge stock-in">In Stock</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if product.description %}
+                            <p class="product-description">{{ product.description|truncatewords:20 }}</p>
+                        {% endif %}
+                        <div class="product-actions">
+                            <a href="{% url 'products:edit_product' product.id %}" class="btn btn-primary">
+                                <i class="fa fa-edit"></i>
+                                Edit
+                            </a>
+                            <a href="{% url 'products:delete_product' product.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this product?')">
+                                <i class="fa fa-trash"></i>
+                                Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fa fa-box-open"></i>
+                </div>
+                <h3>No products yet</h3>
+                <p>Start building your store by adding your first product. You can add products, manage inventory, and track sales all from this dashboard.</p>
+                <a href="{% url 'products:add_product' %}" class="btn btn-primary">
+                    <i class="fa fa-plus"></i>
+                    Add Your First Product
+                </a>
+            </div>
+        {% endif %}
     </div>
 </div>
-
-{% if products %}
-    <div class="product-grid">
-        {% for product in products %}
-        <div class="product-card">
-            <a href="{% url 'products:product_detail' product.id %}" class="product-link">
-                {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
-                {% else %}
-                    <div class="product-image-placeholder">
-                        No Image
-                    </div>
-                {% endif %}
-            </a>
-            <div class="product-info">
-                <h3 class="product-name">{{ product.name }}</h3>
-                <div class="product-meta-row">
-                    <span class="product-price">${{ product.price }}</span>
-                    <span class="product-quantity">
-                        {{ product.quantity }}
-                        {% if product.quantity == 0 %}
-                            <span class="stock-status stock-out">Out of Stock</span>
-                        {% elif product.quantity < 5 %}
-                            <span class="stock-status stock-low">Low Stock</span>
-                        {% else %}
-                            <span class="stock-status stock-in">In Stock</span>
-                        {% endif %}
-                    </span>
-                </div>
-                {% if product.description %}
-                    <p class="product-description">{{ product.description|truncatewords:15 }}</p>
-                {% endif %}
-                <div class="button-group">
-                    <a href="{% url 'products:edit_product' product.id %}" class="btn btn-primary">Edit</a>
-                    <a href="{% url 'products:delete_product' product.id %}" class="btn btn-danger">Delete</a>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="empty-state">
-        <h3>No products in your store</h3>
-        <p>Start building your inventory by adding products!</p>
-        <a href="{% url 'products:add_product' %}" class="btn btn-primary">Add Your First Product</a>
-    </div>
-{% endif %}
 {% endblock %}

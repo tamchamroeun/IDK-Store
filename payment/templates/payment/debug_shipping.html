@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Shipping Methods</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .shipping-method { 
+            border: 2px solid #ccc; 
+            padding: 15px; 
+            margin: 10px 0; 
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .shipping-method:hover {
+            border-color: #007bff;
+        }
+        .shipping-method.selected { 
+            border-color: #007bff; 
+            background-color: #f0f8ff; 
+        }
+        .order-summary { 
+            border: 1px solid #ddd; 
+            padding: 20px; 
+            margin: 20px 0; 
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .summary-item { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 10px 0; 
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .summary-total { 
+            font-weight: bold; 
+            font-size: 1.2em; 
+            border-top: 2px solid #007bff;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        #discount-row { display: none; }
+        #discount-row.active { display: flex; }
+        .debug-info { 
+            background: #ffffcc; 
+            padding: 15px; 
+            border: 1px solid #ffcc00;
+            border-radius: 4px;
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .debug-log {
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .ajax-test {
+            background: #e8f5e8;
+            padding: 15px;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚚 Debug Shipping Methods</h1>
+        
+        <div class="debug-info">
+            <h3>Debug Information:</h3>
+            <div id="debug-output" class="debug-log"></div>
+        </div>
+        
+        <div class="ajax-test">
+            <h3>AJAX Test:</h3>
+            <button onclick="testAjaxEndpoint()">Test Calculate Totals Endpoint</button>
+            <div id="ajax-result"></div>
+        </div>
+        
+        <h2>Available Shipping Methods</h2>
+        {% for shipping_method in shipping_methods %}
+        <div class="shipping-method" data-cost="{{ shipping_method.cost }}">
+            <input type="radio" name="shipping_method" value="{{ shipping_method.id }}" id="shipping_{{ shipping_method.id }}" {% if forloop.first %}checked{% endif %}>
+            <label for="shipping_{{ shipping_method.id }}">
+                <strong>{{ shipping_method.name }}</strong> - ${{ shipping_method.cost }}
+                <br>
+                <small>{{ shipping_method.description }} ({{ shipping_method.estimated_days }} days)</small>
+            </label>
+        </div>
+        {% endfor %}
+        
+        <h2>Order Summary</h2>
+        <div class="order-summary">
+            <div class="summary-item">
+                <span>Subtotal:</span>
+                <span id="subtotal">${{ cart.total_price }}</span>
+            </div>
+            <div class="summary-item">
+                <span>Shipping:</span>
+                <span id="shipping-cost">$0.00</span>
+            </div>
+            <div class="summary-item" id="discount-row">
+                <span>Discount:</span>
+                <span id="discount-amount">-$0.00</span>
+            </div>
+            <div class="summary-item">
+                <span>Tax:</span>
+                <span id="tax-amount">$0.00</span>
+            </div>
+            <div class="summary-item summary-total">
+                <span>Total:</span>
+                <span id="grand-total">${{ cart.total_price }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const shippingMethods = document.querySelectorAll('.shipping-method');
+        const shippingRadios = document.querySelectorAll('.shipping-method input[type="radio"]');
+        const debugOutput = document.getElementById('debug-output');
+        
+        function updateDebugInfo(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugOutput.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+        }
+        
+        function testAjaxEndpoint() {
+            const resultDiv = document.getElementById('ajax-result');
+            resultDiv.innerHTML = '<p>Testing AJAX endpoint...</p>';
+            
+            fetch('/payment/calculate-totals/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': 'test'  // We'll test without proper CSRF for now
+                },
+                body: 'shipping_method_id=1&coupon_code='
+            })
+            .then(response => {
+                resultDiv.innerHTML += `<p>Response status: ${response.status}</p>`;
+                return response.text();  // Get as text first to see what we get
+            })
+            .then(data => {
+                resultDiv.innerHTML += `<p>Response data: <pre>${data}</pre></p>`;
+            })
+            .catch(error => {
+                resultDiv.innerHTML += `<p style="color: red;">Error: ${error}</p>`;
+            });
+        }
+        
+        function updateOrderTotals() {
+            const shippingMethodId = document.querySelector('input[name="shipping_method"]:checked')?.value;
+            
+            updateDebugInfo(`updateOrderTotals called - Selected method ID: ${shippingMethodId}`);
+            
+            if (shippingMethodId) {
+                // Get shipping cost from data attribute for client-side calculation
+                const selectedMethod = document.querySelector(`input[name="shipping_method"][value="${shippingMethodId}"]`);
+                const methodDiv = selectedMethod.closest('.shipping-method');
+                const shippingCost = parseFloat(methodDiv.dataset.cost) || 0;
+                
+                updateDebugInfo(`Shipping cost from data attribute: $${shippingCost}`);
+                
+                // Calculate totals (simple version)
+                const subtotal = {{ cart.total_price }};
+                const discount = 0;
+                const tax = (subtotal + shippingCost - discount) * 0.08; // 8% tax
+                const total = subtotal + shippingCost + tax - discount;
+                
+                // Update display
+                document.getElementById('shipping-cost').textContent = `$${shippingCost.toFixed(2)}`;
+                document.getElementById('tax-amount').textContent = `$${tax.toFixed(2)}`;
+                document.getElementById('grand-total').textContent = `$${total.toFixed(2)}`;
+                
+                updateDebugInfo(`Updated totals - Shipping: $${shippingCost.toFixed(2)}, Tax: $${tax.toFixed(2)}, Total: $${total.toFixed(2)}`);
+                
+                // Animate total change
+                const totalElement = document.getElementById('grand-total');
+                totalElement.style.transform = 'scale(1.1)';
+                totalElement.style.color = '#007bff';
+                setTimeout(() => {
+                    totalElement.style.transform = '';
+                    totalElement.style.color = '';
+                }, 300);
+            }
+        }
+        
+        // Listen for radio button changes
+        shippingRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateDebugInfo(`Radio button changed: ${this.value} (${this.checked ? 'checked' : 'unchecked'})`);
+                
+                const methodDiv = this.closest('.shipping-method');
+                shippingMethods.forEach(m => m.classList.remove('selected'));
+                methodDiv.classList.add('selected');
+                
+                updateOrderTotals();
+            });
+        });
+        
+        // Listen for clicks on the container
+        shippingMethods.forEach(method => {
+            method.addEventListener('click', function(e) {
+                updateDebugInfo(`Method container clicked: ${e.target.tagName}`);
+                if (e.target.tagName !== 'INPUT') {
+                    const radio = this.querySelector('input[type="radio"]');
+                    updateDebugInfo(`Programmatically checking radio: ${radio.value}`);
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change', {bubbles: true}));
+                }
+            });
+        });
+        
+        // Set default selection on page load
+        updateDebugInfo('Page loaded, setting default selection');
+        const checkedRadio = document.querySelector('.shipping-method input[type="radio"]:checked');
+        if (checkedRadio) {
+            updateDebugInfo(`Default radio found: ${checkedRadio.value}`);
+            checkedRadio.dispatchEvent(new Event('change', {bubbles: true}));
+        } else {
+            updateDebugInfo('No default radio found');
+        }
+        
+        updateDebugInfo('JavaScript initialization complete');
+    </script>
+</body>
+</html>

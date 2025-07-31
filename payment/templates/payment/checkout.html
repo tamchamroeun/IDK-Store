@@ -5,251 +5,748 @@
 
 {% block extra_css %}
 <style>
-body { background: #f3f3fd; }
+:root {
+    --primary-color: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #a5b4fc;
+    --secondary-color: #f1f5f9;
+    --success-color: #10b981;
+    --success-dark: #059669;
+    --warning-color: #f59e0b;
+    --warning-light: #fde68a;
+    --danger-color: #ef4444;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+    min-height: 100vh;
+}
+
 .checkout-container {
-    max-width: 1200px;
-    margin: 32px auto 0 auto;
-    padding: 0 8px 60px 8px;
+    max-width: 1400px;
+    margin: 2rem auto 0;
+    padding: 0 1rem 4rem;
 }
-@media (max-width: 900px) {
-    .checkout-container { padding: 0 2vw 30px 2vw; }
+
+.checkout-title {
+    text-align: center;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
+
+@media (min-width: 768px) {
+    .checkout-container {
+        padding: 0 2rem 4rem;
+    }
+}
+
 .checkout-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 32px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
 }
-.checkout-main, .checkout-summary-col {
-    flex: 1 1 320px;
-    min-width: 340px;
+
+@media (min-width: 1024px) {
+    .checkout-grid {
+        grid-template-columns: 2fr 1fr;
+        gap: 3rem;
+    }
 }
+
+.checkout-main {
+    order: 1;
+}
+
 .checkout-summary-col {
-    max-width: 360px;
+    order: 2;
+    position: relative;
 }
-@media (max-width: 900px) {
-    .checkout-grid { flex-direction: column; gap: 24px; }
-    .checkout-main, .checkout-summary-col { min-width: 0; max-width: 100%; }
+
+@media (min-width: 1024px) {
+    .checkout-main {
+        order: 1;
+    }
+    
+    .checkout-summary-col {
+        order: 2;
+        position: sticky;
+        top: 2rem;
+        align-self: start;
+    }
 }
+
 .checkout-section {
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 2px 10px 0 #7b2ff215;
-    margin-bottom: 24px;
-    padding: 28px 22px 22px 22px;
+    background: var(--white);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    position: relative;
+    transition: var(--transition);
 }
+
+.checkout-section:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.checkout-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+}
+
 .section-title {
-    font-size: 1.33rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #232b3b;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 8px;
-    letter-spacing: 0.7px;
-}
-.form-row {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-.form-col { flex: 1; }
-@media (max-width: 600px) {
-    .form-row { flex-direction: column; gap: 0; }
-}
-.form-group { margin-bottom: 14px; }
-.form-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #232b3b;
-}
-.form-control {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid #e3e3ee;
-    border-radius: 7px;
-    font-size: 1rem;
-    background: #fafbfc;
-    transition: border 0.18s;
-}
-.form-control:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 0 2px #007bff22;
-}
-.shipping-method {
-    border: 1.3px solid #e3e3ee;
-    border-radius: 7px;
-    padding: 17px 15px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    transition: border 0.18s, background 0.18s;
-    background: #fafbfc;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
 }
+
+.section-title::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.form-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    background: var(--white);
+    transition: var(--transition);
+    color: var(--text-primary);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-control:hover {
+    border-color: var(--primary-light);
+}
+
+.shipping-method {
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--white);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.shipping-method::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--border-color);
+    transition: var(--transition);
+}
+
 .shipping-method.selected {
-    border-color: #007bff;
-    background: #e3f2fd;
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(16, 185, 129, 0.05));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
+
+.shipping-method.selected::before {
+    background: linear-gradient(180deg, var(--primary-color), var(--success-color));
+}
+
+.shipping-method:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
 .shipping-method input[type="radio"] {
-    accent-color: #007bff;
-    margin-right: 12px;
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: var(--primary-color);
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.shipping-method label {
+    flex: 1;
+    cursor: pointer;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.shipping-method strong {
+    color: var(--text-primary);
+    font-size: 1.125rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.shipping-method small {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
 }
 .order-summary {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 24px 16px;
-    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
 }
+
+.order-summary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+}
+
 .summary-item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 9px;
-    padding: 3px 0;
-    font-size: 1.08rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.75rem 0;
+    font-size: 1.125rem;
+    border-bottom: 1px solid var(--border-color);
 }
+
+.summary-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
 .summary-total {
-    border-top: 2px solid #007bff;
-    padding-top: 10px;
-    font-weight: bold;
-    font-size: 1.22rem;
-    color: #007bff;
-    margin-top: 7px;
+    border-top: 2px solid var(--primary-color);
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
-.coupon-section {
-    background: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 7px;
-    padding: 15px 15px 7px 15px;
-    margin-bottom: 16px;
-}
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 15px;
+
+#discount-row {
+    display: none;
+    color: var(--success-color);
     font-weight: 600;
-    transition: all 0.23s;
-    margin: 0 2px;
-    box-shadow: 0 1px 5px #007bff10;
 }
-.btn-primary {
-    background-color: #007bff;
-    color: white;
+
+#discount-row.show {
+    display: flex;
 }
-.btn-primary:hover {
-    background-color: #0056b3;
+
+.coupon-section {
+    background: linear-gradient(135deg, var(--warning-light) 0%, #fef3c7 100%);
+    border: 1px solid var(--warning-color);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
 }
-.btn-success {
-    background-color: #28a745;
-    color: white;
+
+.coupon-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--warning-color);
 }
-.btn-success:hover {
-    background-color: #1e7e34;
-}
-.btn-use-saved {
-    background: #28a745;
-    color: white;
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
     border: none;
-    padding: 7px 15px;
-    border-radius: 4px;
-    font-size: 14px;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    text-decoration: none;
+    margin: 0.25rem;
 }
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: var(--white);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: var(--white);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color), var(--success-dark));
+    color: var(--white);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: var(--white);
+}
+
+.btn.w-100 {
+    width: 100%;
+    justify-content: center;
+    padding: 1.25rem 2rem;
+    font-size: 1.125rem;
+    margin-top: 1.5rem;
+}
+
+.btn-use-saved {
+    background: var(--success-color);
+    color: var(--white);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
 .btn-use-saved:hover {
-    background: #218838;
+    background: var(--success-dark);
+    transform: translateY(-1px);
 }
+
 .error-message {
-    color: #dc3545;
-    font-size: 12px;
-    margin-top: 5px;
+    color: var(--danger-color);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-message::before {
+    content: '⚠';
+    color: var(--danger-color);
 }
 .order-item {
     display: flex;
     align-items: center;
-    padding: 13px 0;
-    border-bottom: 1px solid #eee;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
 }
-.order-item:last-child { border-bottom: none; }
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-item:hover {
+    background: var(--gray-50);
+    margin: 0 -1rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+}
+
 .item-image {
-    width: 54px;
-    height: 54px;
+    width: 60px;
+    height: 60px;
     object-fit: cover;
-    border-radius: 7px;
-    margin-right: 12px;
-    background: #f5f6fa;
+    border-radius: var(--radius-lg);
+    margin-right: 1rem;
+    background: var(--gray-100);
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px solid var(--border-color);
+    transition: var(--transition);
 }
-.item-image .fa-image { font-size: 1.7rem; color: #bdbdbd; }
-.item-details { flex: 1; }
+
+.item-image:hover {
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.item-image .fa-image {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+}
+
+.item-details {
+    flex: 1;
+}
+
 .item-name {
-    font-weight: 500;
-    margin-bottom: 2px;
-    color: #333;
-}
-.item-price {
-    color: #666;
-    font-size: 14px;
-}
-.item-total {
     font-weight: 600;
-    color: #007bff;
-    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+    font-size: 1.125rem;
 }
+
+.item-price {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.item-total {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1.25rem;
+}
+
 .save-info-group {
-    margin-top: 17px;
-    padding: 12px 17px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border-left: 4px solid #007bff;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+    border-radius: var(--radius-xl);
+    border-left: 4px solid var(--primary-color);
+    border: 1px solid var(--border-color);
 }
+
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 0.75rem;
     font-weight: 500;
-    color: #495057;
+    color: var(--text-primary);
     cursor: pointer;
+    transition: var(--transition);
 }
+
+.checkbox-label:hover {
+    color: var(--primary-color);
+}
+
 .checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 1.25rem;
+    height: 1.25rem;
     cursor: pointer;
+    accent-color: var(--primary-color);
+    border-radius: var(--radius-sm);
 }
+
 .saved-info-section {
-    background: #e8f5e8;
-    border: 1px solid #c3e6cb;
-    border-radius: 8px;
-    padding: 13px 14px;
-    margin-bottom: 17px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: var(--transition);
 }
+
+.saved-info-section:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
 .saved-info-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 1rem;
+    gap: 1rem;
 }
+
 .saved-info-header i {
-    color: #28a745;
-    margin-right: 6px;
+    color: var(--success-color);
+    font-size: 1.25rem;
 }
+
 .saved-info-header span {
     font-weight: 600;
-    color: #155724;
+    color: var(--success-color);
     flex: 1;
+    font-size: 1.125rem;
 }
+
 .saved-info-preview {
-    font-size: 14px;
-    color: #155724;
-    line-height: 1.4;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
 }
-.saved-info-preview p { margin: 4px 0; }
-.saved-info-preview strong { color: #0f5132; }
+
+.saved-info-preview p {
+    margin: 0.5rem 0;
+}
+
+.saved-info-preview strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Hidden elements */
+.hidden {
+    display: none !important;
+}
+
+#discount-row {
+    display: none;
+}
+
+#discount-row.active {
+    display: flex;
+}
+
 @media (max-width: 600px) {
-    .checkout-section { padding: 13px 7px 9px 7px; }
+    .checkout-section { 
+        padding: 13px 7px 9px 7px; 
+    }
+    
+    .checkout-container {
+        margin: 0 0.5rem;
+    }
+    
+    .row {
+        margin: 0;
+    }
+    
+    .col-md-8, .col-md-4 {
+        padding: 0 0.5rem;
+    }
+    
+    .section-header {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+        padding: 0.875rem;
+        font-size: 1rem;
+    }
+    
+    .shipping-method {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .shipping-method h5 {
+        font-size: 1rem;
+    }
+    
+    .order-summary {
+        margin-top: 2rem;
+        padding: 1rem;
+    }
+    
+    .summary-item {
+        padding: 0.75rem 0;
+        font-size: 0.9rem;
+    }
+    
+    .summary-total {
+        font-size: 1.125rem;
+    }
+    
+    .order-item {
+        padding: 0.75rem 0;
+    }
+    
+    .item-image {
+        width: 50px;
+        height: 50px;
+        margin-right: 0.75rem;
+    }
+    
+    .item-name {
+        font-size: 1rem;
+    }
+    
+    .item-total {
+        font-size: 1rem;
+    }
+    
+    .save-info-group {
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .saved-info-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Improve touch targets on mobile */
+    .form-control, .form-select {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .checkbox-label input[type="checkbox"] {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    /* Better spacing for mobile */
+    .mb-3 {
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .mb-4 {
+        margin-bottom: 2rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkout-container {
+        margin: 0 0.25rem;
+    }
+    
+    .section-header {
+        font-size: 1.125rem;
+        text-align: center;
+    }
+    
+    .shipping-method {
+        padding: 0.875rem;
+    }
+    
+    .order-summary {
+        padding: 0.875rem;
+    }
+    
+    .summary-item {
+        font-size: 0.875rem;
+    }
+    
+    .btn {
+        font-size: 0.95rem;
+        padding: 1rem;
+    }
+    
+    /* Stack form elements on very small screens */
+    .form-row .col-md-6 {
+        margin-bottom: 1rem;
+    }
+    
+    .item-details {
+        min-width: 0; /* Allow text truncation */
+    }
+    
+    .item-name {
+        font-size: 0.9rem;
+        line-height: 1.3;
+    }
 }
 </style>
 {% endblock %}
@@ -483,7 +980,25 @@ body { background: #f3f3fd; }
                 <div class="checkout-section">
                     <h3 class="section-title">Order Summary</h3>
                     <div class="order-summary">
-                        <!-- ... your order items code ... -->
+                        <!-- Cart Items -->
+                        {% for item in cart.items.all %}
+                        <div class="order-item">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-image">
+                            {% else %}
+                                <div class="item-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            {% endif %}
+                            <div class="item-details">
+                                <div class="item-name">{{ item.product.name }}</div>
+                                <div class="item-price">Qty: {{ item.quantity }} × ${{ item.product.price }}</div>
+                            </div>
+                            <div class="item-total">${{ item.total_price }}</div>
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- Order Totals -->
                         <div class="summary-item">
                             <span>Subtotal:</span>
                             <span id="subtotal">${{ cart.total_price }}</span>
@@ -492,7 +1007,7 @@ body { background: #f3f3fd; }
                             <span>Shipping:</span>
                             <span id="shipping-cost">$0.00</span>
                         </div>
-                        <div class="summary-item" id="discount-row" style="display: none;">
+                        <div class="summary-item" id="discount-row">
                             <span>Discount:</span>
                             <span id="discount-amount" class="text-success">-$0.00</span>
                         </div>
@@ -523,57 +1038,176 @@ document.addEventListener('DOMContentLoaded', function() {
     const shippingRadios = document.querySelectorAll('.shipping-method input[type="radio"]');
 
     function updateOrderTotals(shippingCost = null, discount = null) {
+        // Get current values or use AJAX for accurate calculation
+        const shippingMethodId = document.querySelector('input[name="shipping_method"]:checked')?.value;
+        const couponCode = document.getElementById('{{ checkout_form.coupon_code.id_for_label }}')?.value || '';
+        
+        console.log('updateOrderTotals called with:', {
+            shippingCost,
+            discount,
+            shippingMethodId,
+            couponCode
+        });
+        
+        if (shippingMethodId) {
+            // Use AJAX to get accurate totals from server
+            fetch('{% url "payment:calculate_order_totals" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: `shipping_method_id=${shippingMethodId}&coupon_code=${encodeURIComponent(couponCode)}`
+            })
+            .then(response => {
+                console.log('AJAX response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('AJAX response data:', data);
+                if (data.success) {
+                    // Update all totals
+                    document.getElementById('subtotal').textContent = '$' + data.subtotal.toFixed(2);
+                    document.getElementById('shipping-cost').textContent = '$' + data.shipping_cost.toFixed(2);
+                    document.getElementById('tax-amount').textContent = '$' + data.tax_amount.toFixed(2);
+                    document.getElementById('grand-total').textContent = '$' + data.grand_total.toFixed(2);
+                    
+                    // Handle discount row
+                    const discountRow = document.getElementById('discount-row');
+                    const discountAmount = document.getElementById('discount-amount');
+                    
+                    if (data.discount_amount > 0) {
+                        discountAmount.textContent = '-$' + data.discount_amount.toFixed(2);
+                        discountRow.classList.add('active');
+                    } else {
+                        discountRow.classList.remove('active');
+                    }
+                    
+                    // Animate total change
+                    const totalElement = document.getElementById('grand-total');
+                    totalElement.style.transform = 'scale(1.05)';
+                    totalElement.style.color = 'var(--primary-color)';
+                    setTimeout(() => {
+                        totalElement.style.transform = '';
+                        totalElement.style.color = '';
+                    }, 300);
+                    
+                    console.log('Order totals updated via AJAX:', data);
+                } else {
+                    console.error('Error calculating totals:', data.error);
+                    // Fallback to client-side calculation
+                    fallbackCalculation(shippingCost, discount);
+                }
+            })
+            .catch(error => {
+                console.error('AJAX error:', error);
+                // Fallback to client-side calculation
+                fallbackCalculation(shippingCost, discount);
+            });
+        } else {
+            console.log('No shipping method selected, using fallback');
+            // Fallback calculation if no shipping method selected
+            fallbackCalculation(shippingCost, discount);
+        }
+    }
+    
+    function fallbackCalculation(shippingCost = null, discount = null) {
+        console.log('Fallback calculation called with:', { shippingCost, discount });
+        
         const subtotal = parseFloat('{{ cart.total_price }}');
         let currentShipping = 0;
+        let currentDiscount = 0;
+        let currentTax = 0;
+        
+        // Handle shipping cost
         if (shippingCost !== null) {
             currentShipping = shippingCost;
+            document.getElementById('shipping-cost').textContent = '$' + currentShipping.toFixed(2);
         } else {
-            const shippingText = document.getElementById('shipping-cost').textContent.replace('$', '');
-            currentShipping = parseFloat(shippingText) || 0;
+            // Try to get shipping cost from selected method
+            const selectedMethod = document.querySelector('.shipping-method input[type="radio"]:checked');
+            if (selectedMethod) {
+                const methodDiv = selectedMethod.closest('.shipping-method');
+                currentShipping = parseFloat(methodDiv.dataset.cost) || 0;
+                document.getElementById('shipping-cost').textContent = '$' + currentShipping.toFixed(2);
+            } else {
+                const shippingText = document.getElementById('shipping-cost').textContent.replace('$', '');
+                currentShipping = parseFloat(shippingText) || 0;
+            }
         }
-        let currentDiscount = 0;
+        
+        // Handle discount
         if (discount !== null) {
             currentDiscount = discount;
-        } else {
-            const discountText = document.getElementById('discount-amount').textContent.replace('-$', '').replace('$', '');
-            currentDiscount = parseFloat(discountText) || 0;
-        }
-        if (shippingCost !== null) {
-            document.getElementById('shipping-cost').textContent = '$' + currentShipping.toFixed(2);
-        }
-        if (discount !== null) {
             const discountElement = document.getElementById('discount-amount');
             const discountRow = document.getElementById('discount-row');
             discountElement.textContent = '-$' + currentDiscount.toFixed(2);
             if (currentDiscount > 0) {
-                discountRow.style.display = 'flex';
-                discountRow.style.justifyContent = 'space-between';
+                discountRow.classList.add('active');
             } else {
-                discountRow.style.display = 'none';
+                discountRow.classList.remove('active');
             }
+        } else {
+            const discountText = document.getElementById('discount-amount').textContent.replace(/[$-]/g, '');
+            currentDiscount = parseFloat(discountText) || 0;
         }
-        const total = subtotal + currentShipping - currentDiscount;
-        document.getElementById('grand-total').textContent = '$' + total.toFixed(2);
-        // For debugging:
-        // console.log('Order totals updated:', {subtotal, currentShipping, currentDiscount, total});
+        
+        // Calculate tax (8% on subtotal + shipping - discount)
+        currentTax = (subtotal + currentShipping - currentDiscount) * 0.08;
+        document.getElementById('tax-amount').textContent = '$' + currentTax.toFixed(2);
+        
+        // Calculate total
+        const total = subtotal + currentShipping + currentTax - currentDiscount;
+        const totalElement = document.getElementById('grand-total');
+        totalElement.textContent = '$' + total.toFixed(2);
+        
+        // Animate total change
+        totalElement.style.transform = 'scale(1.05)';
+        totalElement.style.color = 'var(--primary-color)';
+        setTimeout(() => {
+            totalElement.style.transform = '';
+            totalElement.style.color = '';
+        }, 300);
+        
+        console.log('Fallback calculation results:', {
+            subtotal: subtotal,
+            shipping: currentShipping,
+            discount: currentDiscount,
+            tax: currentTax,
+            total: total
+        });
     }
 
     // Listen for radio button changes!
     shippingRadios.forEach(radio => {
         radio.addEventListener('change', function() {
+            console.log('Shipping method changed:', {
+                value: this.value,
+                name: this.name,
+                checked: this.checked
+            });
+            
             const methodDiv = this.closest('.shipping-method');
+            const cost = parseFloat(methodDiv.dataset.cost) || 0;
+            
+            console.log('Method div:', methodDiv);
+            console.log('Data cost:', cost);
+            
             shippingMethods.forEach(m => m.classList.remove('selected'));
             methodDiv.classList.add('selected');
-            const cost = parseFloat(methodDiv.dataset.cost) || 0;
-            updateOrderTotals(cost);
+            
+            // Call updateOrderTotals without parameters to use AJAX
+            updateOrderTotals();
         });
     });
 
     // Listen for clicks on the container (for the DIV)
     shippingMethods.forEach(method => {
         method.addEventListener('click', function(e) {
+            console.log('Shipping method div clicked:', e.target);
             if (e.target.tagName !== 'INPUT') {
                 const radio = this.querySelector('input[type="radio"]');
+                console.log('Triggering radio change:', radio);
                 radio.checked = true;
                 radio.dispatchEvent(new Event('change', {bubbles: true}));
             }
@@ -583,8 +1217,298 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set default selection on page load
     const checkedRadio = document.querySelector('.shipping-method input[type="radio"]:checked');
     if (checkedRadio) {
+        console.log('Setting default shipping method on page load:', checkedRadio.value);
         checkedRadio.dispatchEvent(new Event('change', {bubbles: true}));
+    } else {
+        console.log('No shipping method checked by default');
     }
+
+    // Functions for using saved information
+    window.useSavedBilling = function() {
+        const savedData = {
+            first_name: '{{ user.profile.billing_first_name|default:"" }}',
+            last_name: '{{ user.profile.billing_last_name|default:"" }}',
+            phone: '{{ user.profile.billing_phone|default:"" }}'
+        };
+        
+        if (savedData.first_name) {
+            document.getElementById('{{ checkout_form.first_name.id_for_label }}').value = savedData.first_name;
+            document.getElementById('{{ checkout_form.last_name.id_for_label }}').value = savedData.last_name;
+            document.getElementById('{{ checkout_form.phone.id_for_label }}').value = savedData.phone;
+        }
+    };
+
+    window.useSavedShipping = function() {
+        const savedData = {
+            first_name: '{{ user.profile.shipping_first_name|default:"" }}',
+            last_name: '{{ user.profile.shipping_last_name|default:"" }}',
+            phone: '{{ user.profile.shipping_phone|default:"" }}',
+            address: '{{ user.profile.shipping_address|default:"" }}',
+            city: '{{ user.profile.shipping_city|default:"" }}',
+            state: '{{ user.profile.shipping_state|default:"" }}',
+            postal_code: '{{ user.profile.shipping_postal_code|default:"" }}',
+            country: '{{ user.profile.shipping_country|default:"" }}'
+        };
+        
+        if (savedData.address) {
+            document.getElementById('{{ checkout_form.shipping_first_name.id_for_label }}').value = savedData.first_name;
+            document.getElementById('{{ checkout_form.shipping_last_name.id_for_label }}').value = savedData.last_name;
+            document.getElementById('{{ checkout_form.shipping_phone.id_for_label }}').value = savedData.phone;
+            document.getElementById('{{ checkout_form.shipping_address.id_for_label }}').value = savedData.address;
+            document.getElementById('{{ checkout_form.shipping_city.id_for_label }}').value = savedData.city;
+            document.getElementById('{{ checkout_form.shipping_state.id_for_label }}').value = savedData.state;
+            document.getElementById('{{ checkout_form.shipping_postal_code.id_for_label }}').value = savedData.postal_code;
+            document.getElementById('{{ checkout_form.shipping_country.id_for_label }}').value = savedData.country;
+        }
+    };
+
+    // Coupon functionality
+    document.getElementById('apply-coupon-btn')?.addEventListener('click', function() {
+        const couponCode = document.getElementById('{{ checkout_form.coupon_code.id_for_label }}').value.trim();
+        const messageDiv = document.getElementById('coupon-message');
+        
+        if (!couponCode) {
+            messageDiv.innerHTML = '<div class="error-message">Please enter a coupon code</div>';
+            return;
+        }
+        
+        // Show loading state
+        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Applying...';
+        this.disabled = true;
+        
+        // Use the calculate totals endpoint which includes coupon validation
+        const shippingMethodId = document.querySelector('input[name="shipping_method"]:checked')?.value;
+        
+        if (!shippingMethodId) {
+            messageDiv.innerHTML = '<div class="error-message">Please select a shipping method first</div>';
+            this.innerHTML = 'Apply Coupon';
+            this.disabled = false;
+            return;
+        }
+        
+        fetch('{% url "payment:calculate_order_totals" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: `shipping_method_id=${shippingMethodId}&coupon_code=${encodeURIComponent(couponCode)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update all totals
+                document.getElementById('subtotal').textContent = '$' + data.subtotal.toFixed(2);
+                document.getElementById('shipping-cost').textContent = '$' + data.shipping_cost.toFixed(2);
+                document.getElementById('tax-amount').textContent = '$' + data.tax_amount.toFixed(2);
+                document.getElementById('grand-total').textContent = '$' + data.grand_total.toFixed(2);
+                
+                // Handle discount row
+                const discountRow = document.getElementById('discount-row');
+                const discountAmount = document.getElementById('discount-amount');
+                
+                if (data.discount_amount > 0) {
+                    discountAmount.textContent = '-$' + data.discount_amount.toFixed(2);
+                    discountRow.classList.add('active');
+                    messageDiv.innerHTML = '<div class="text-success"><i class="fas fa-check me-2"></i>Coupon applied successfully! You saved $' + data.discount_amount.toFixed(2) + '</div>';
+                } else {
+                    discountRow.classList.remove('active');
+                    messageDiv.innerHTML = '<div class="error-message">Coupon code is valid but provides no discount for this order</div>';
+                }
+            } else {
+                messageDiv.innerHTML = '<div class="error-message">' + data.error + '</div>';
+            }
+            
+            this.innerHTML = 'Apply Coupon';
+            this.disabled = false;
+        })
+        .catch(error => {
+            console.error('Coupon application error:', error);
+            messageDiv.innerHTML = '<div class="error-message">An error occurred while applying the coupon</div>';
+            this.innerHTML = 'Apply Coupon';
+            this.disabled = false;
+        });
+    });
+
+    // Form validation enhancements
+    const form = document.querySelector('#checkout-form');
+    const submitBtn = document.querySelector('#place-order-btn');
+    
+    if (form && submitBtn) {
+        // Real-time validation
+        const inputs = form.querySelectorAll('input[required], select[required]');
+        
+        inputs.forEach(input => {
+            input.addEventListener('blur', validateField);
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid')) {
+                    validateField.call(this);
+                }
+            });
+        });
+        
+        function validateField() {
+            const isValid = this.checkValidity();
+            this.classList.toggle('is-valid', isValid);
+            this.classList.toggle('is-invalid', !isValid);
+            
+            // Custom validation messages
+            const errorDiv = this.parentNode.querySelector('.invalid-feedback');
+            if (!isValid && errorDiv) {
+                if (this.type === 'email') {
+                    errorDiv.textContent = 'Please enter a valid email address';
+                } else if (this.type === 'tel') {
+                    errorDiv.textContent = 'Please enter a valid phone number';
+                } else if (this.required && !this.value.trim()) {
+                    errorDiv.textContent = 'This field is required';
+                }
+            }
+            
+            updateSubmitButton();
+        }
+        
+        function updateSubmitButton() {
+            const invalidInputs = form.querySelectorAll('.is-invalid');
+            const allRequired = form.querySelectorAll('input[required], select[required]');
+            const filledRequired = Array.from(allRequired).every(input => input.value.trim() !== '');
+            
+            submitBtn.disabled = invalidInputs.length > 0 || !filledRequired;
+        }
+        
+        // Enhanced form submission
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            inputs.forEach(input => {
+                validateField.call(input);
+                if (!input.checkValidity()) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                // Scroll to first invalid field
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+            } else {
+                // Show loading state
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+    
+    // Enhanced mobile interactions
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        // Add touch feedback to interactive elements
+        const interactiveElements = document.querySelectorAll('.btn, .form-control, .shipping-method');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+        
+        // Improved scroll behavior for mobile
+        document.body.style.webkitOverflowScrolling = 'touch';
+    }
+    
+    // Auto-save form data (for better UX)
+    if (typeof(Storage) !== "undefined") {
+        const formData = {};
+        
+        inputs.forEach(input => {
+            // Load saved data
+            const savedValue = localStorage.getItem(`checkout_${input.name}`);
+            if (savedValue && input.type !== 'password') {
+                input.value = savedValue;
+            }
+            
+            // Save data on input
+            input.addEventListener('input', function() {
+                if (this.type !== 'password') {
+                    localStorage.setItem(`checkout_${this.name}`, this.value);
+                }
+            });
+        });
+        
+        // Clear saved data on successful submission
+        form?.addEventListener('submit', function() {
+            inputs.forEach(input => {
+                localStorage.removeItem(`checkout_${input.name}`);
+            });
+        });
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Alt+S to submit form
+        if (e.altKey && e.key === 's') {
+            e.preventDefault();
+            if (submitBtn && !submitBtn.disabled) {
+                submitBtn.click();
+            }
+        }
+        
+        // Escape to scroll to top
+        if (e.key === 'Escape') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+    
+    // Animate elements on scroll (Intersection Observer)
+    if ('IntersectionObserver' in window) {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe checkout sections
+        document.querySelectorAll('.checkout-section, .order-summary').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+    }
+    
+    // Initialize tooltips and enhanced UX
+    document.querySelectorAll('[title]').forEach(element => {
+        element.style.cursor = 'help';
+    });
+    
+    // Add loading states to async operations
+    const asyncButtons = document.querySelectorAll('[data-async]');
+    asyncButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+            this.disabled = true;
+            
+            // Re-enable after 3 seconds (fallback)
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            }, 3000);
+        });
+    });
 });
 </script>
 {% endblock %}

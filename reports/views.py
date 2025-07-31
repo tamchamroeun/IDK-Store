@@ -1,29 +1,28 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Sum, Count, Avg, Q
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import timedelta
 from decimal import Decimal
 import json
+import csv
 
 from accounts.decorators import owner_required
 from orders.models import Order, OrderItem
-from products.models import Product
-from .models import SalesReport, ProductSalesReport, CustomerSalesReport
 from .forms import ReportFilterForm
 
+from django.template.loader import render_to_string
+try:
+    from weasyprint import HTML
+    weasyprint_installed = True
+except ImportError:
+    weasyprint_installed = False
 
 @login_required
 @owner_required
 def dashboard(request):
-    """
-    Main dashboard view for reports
-    """
-    # Quick stats for the last 30 days
     thirty_days_ago = timezone.now().date() - timedelta(days=30)
-    
     recent_stats = {
         'total_orders': Order.objects.filter(created_at__date__gte=thirty_days_ago).count(),
         'total_revenue': Order.objects.filter(
@@ -38,11 +37,7 @@ def dashboard(request):
             created_at__date__gte=thirty_days_ago
         ).values('user').distinct().count(),
     }
-    
-    # Recent orders
     recent_orders = Order.objects.select_related('user').order_by('-created_at')[:10]
-    
-    # Top selling products (last 30 days)
     top_products = OrderItem.objects.filter(
         order__created_at__date__gte=thirty_days_ago,
         order__status='delivered'
@@ -50,239 +45,152 @@ def dashboard(request):
         total_sold=Sum('quantity'),
         total_revenue=Sum('price')
     ).order_by('-total_sold')[:5]
-    
+
     context = {
         'stats': recent_stats,
         'recent_orders': recent_orders,
         'top_products': top_products,
         'thirty_days_ago': thirty_days_ago,
     }
-    
     return render(request, 'reports/dashboard.html', context)
-
 
 @login_required
 @owner_required
 def sales_report(request):
-    """
-    Generate and display sales reports
-    """
     form = ReportFilterForm(request.GET or None)
     report_data = None
-    
     if form.is_valid():
         report_type = form.cleaned_data['report_type']
         start_date = form.cleaned_data['start_date']
         end_date = form.cleaned_data['end_date']
-        
-        # Generate the report
-        report_data = generate_sales_report(report_type, start_date, end_date, request.user)
-    
+        report_data = generate_sales_report(report_type, start_date, end_date)
     context = {
         'form': form,
         'report_data': report_data,
     }
-    
     return render(request, 'reports/sales_report.html', context)
-
-
-@login_required
-@owner_required
-def product_report(request):
-    """
-    Product-specific sales report
-    """
-    form = ReportFilterForm(request.GET or None)
-    product_data = None
-    
-    if form.is_valid():
-        start_date = form.cleaned_data['start_date']
-        end_date = form.cleaned_data['end_date']
-        
-        # Generate product sales data
-        product_data = OrderItem.objects.filter(
-            order__created_at__date__range=[start_date, end_date],
-            order__status='delivered'
-        ).values(
-            'product__name',
-            'product__id'
-        ).annotate(
-            total_sold=Sum('quantity'),
-            total_revenue=Sum('price'),
-            average_price=Avg('price')
-        ).order_by('-total_sold')
-    
-    context = {
-        'form': form,
-        'product_data': product_data,
-    }
-    
-    return render(request, 'reports/product_report.html', context)
-
-
-@login_required
-@owner_required
-def customer_report(request):
-    """
-    Customer-specific sales report
-    """
-    form = ReportFilterForm(request.GET or None)
-    customer_data = None
-    
-    if form.is_valid():
-        start_date = form.cleaned_data['start_date']
-        end_date = form.cleaned_data['end_date']
-        
-        # Generate customer sales data
-        customer_data = Order.objects.filter(
-            created_at__date__range=[start_date, end_date],
-            status='delivered'
-        ).values(
-            'user__username',
-            'user__email',
-            'user__first_name',
-            'user__last_name'
-        ).annotate(
-            total_orders=Count('id'),
-            total_spent=Sum('total_amount'),
-            average_order_value=Avg('total_amount')
-        ).order_by('-total_spent')
-    
-    context = {
-        'form': form,
-        'customer_data': customer_data,
-    }
-    
-    return render(request, 'reports/customer_report.html', context)
-
 
 @login_required
 @owner_required
 def export_report(request):
     """
-    Export reports as CSV or JSON
+    Export sales report as CSV, JSON, or PDF.
+    Accepts GET parameters: report_type, start_date, end_date, format
     """
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        report_type = data.get('report_type')
-        export_format = data.get('format', 'csv')
-        start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d').date()
-        end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d').date()
-        
-        if export_format == 'csv':
-            return export_csv_report(report_type, start_date, end_date)
-        elif export_format == 'json':
-            return export_json_report(report_type, start_date, end_date)
-    
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    report_type = request.GET.get('report_type', 'sales')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    fmt = request.GET.get('format', 'csv')
 
+    # Defensive: If no dates, use all data
+    if not start_date or not end_date:
+        earliest = Order.objects.order_by('created_at').first()
+        latest = Order.objects.order_by('-created_at').first()
+        start_date = earliest.created_at.date() if earliest else timezone.now().date()
+        end_date = latest.created_at.date() if latest else timezone.now().date()
 
-def generate_sales_report(report_type, start_date, end_date, user):
+    report_data = generate_sales_report(report_type, start_date, end_date)
+
+    if fmt == 'csv':
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="sales_report_{start_date}_{end_date}.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['Order Status', 'Count', 'Revenue'])
+        for status in report_data['status_breakdown']:
+            writer.writerow([
+                status['status'].title() if 'status' in status else '',
+                status['count'],
+                float(status['revenue']) if status['revenue'] is not None else 0.0,
+            ])
+        writer.writerow([])
+        writer.writerow(['Date', 'Orders', 'Revenue'])
+        for day in report_data['daily_sales']:
+            writer.writerow([
+                day['day'],
+                day['orders_count'],
+                float(day['revenue']) if day['revenue'] is not None else 0.0,
+            ])
+        return response
+
+    elif fmt == 'json':
+        def decimal_default(obj):
+            if isinstance(obj, Decimal):
+                return float(obj)
+            return str(obj)
+        response = HttpResponse(
+            json.dumps(report_data, default=decimal_default, indent=2),
+            content_type='application/json'
+        )
+        response['Content-Disposition'] = f'attachment; filename="sales_report_{start_date}_{end_date}.json"'
+        return response
+
+    elif fmt == 'pdf':
+        if not weasyprint_installed:
+            return HttpResponse("WeasyPrint is not installed. PDF export is unavailable.", content_type='text/plain', status=501)
+        html_string = render_to_string('reports/sales_report_pdf.html', {'report_data': report_data})
+        try:
+            pdf_file = HTML(string=html_string).write_pdf()
+        except Exception as e:
+            return HttpResponse(f"PDF generation failed: {e}", content_type='text/plain', status=500)
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="sales_report_{start_date}_{end_date}.pdf"'
+        return response
+
+    else:
+        return JsonResponse({'error': 'Unsupported format'}, status=400)
+
+def generate_sales_report(report_type, start_date, end_date):
     """
-    Generate comprehensive sales report data
+    Generate comprehensive sales report data.
+    Returns a dict with summary and breakdowns.
     """
-    # Filter orders within date range
-    orders = Order.objects.filter(
+    # Only delivered orders for main KPIs
+    delivered_orders = Order.objects.filter(
         created_at__date__range=[start_date, end_date],
         status='delivered'
     )
-    
-    # Calculate metrics
-    total_orders = orders.count()
-    total_revenue = orders.aggregate(Sum('total_amount'))['total_amount__sum'] or Decimal('0.00')
-    average_order_value = orders.aggregate(Avg('total_amount'))['total_amount__avg'] or Decimal('0.00')
-    
-    # Total items sold
+
+    total_orders = delivered_orders.count()
+    total_revenue = delivered_orders.aggregate(Sum('total_amount'))['total_amount__sum'] or Decimal('0.00')
+    average_order_value = delivered_orders.aggregate(Avg('total_amount'))['total_amount__avg'] or Decimal('0.00')
     total_items_sold = OrderItem.objects.filter(
-        order__in=orders
+        order__in=delivered_orders
     ).aggregate(Sum('quantity'))['quantity__sum'] or 0
-    
-    # Order status breakdown (include all statuses for comparison, but only delivered orders contribute to revenue)
-    status_breakdown = Order.objects.filter(
-        created_at__date__range=[start_date, end_date]
-    ).values('status').annotate(
-        count=Count('id'),
-        revenue=Sum('total_amount', filter=Q(status='delivered'))
-    ).order_by('status')
-    
-    # Daily sales data for charts (only delivered orders for revenue)
-    daily_sales = Order.objects.filter(
-        created_at__date__range=[start_date, end_date]
-    ).extra(
-        select={'day': 'date(created_at)'}
-    ).values('day').annotate(
-        orders_count=Count('id'),
-        revenue=Sum('total_amount', filter=Q(status='delivered'))
-    ).order_by('day')
-    
+
+    # All statuses for breakdown, revenue is sum for each status, not just delivered
+    status_breakdown = list(
+        Order.objects.filter(
+            created_at__date__range=[start_date, end_date]
+        ).values('status').annotate(
+            count=Count('id'),
+            revenue=Sum('total_amount')
+        ).order_by('status')
+    )
+    for s in status_breakdown:
+        s['revenue'] = float(s['revenue'] or 0.0)
+
+    # Daily sales (delivered orders only for revenue)
+    daily_sales = list(
+        Order.objects.filter(
+            created_at__date__range=[start_date, end_date]
+        ).extra(
+            select={'day': 'date(created_at)'}
+        ).values('day').annotate(
+            orders_count=Count('id'),
+            revenue=Sum('total_amount', filter=Q(status='delivered'))
+        ).order_by('day')
+    )
+    for d in daily_sales:
+        d['revenue'] = float(d['revenue'] or 0.0)
+
     return {
         'report_type': report_type,
         'start_date': start_date,
         'end_date': end_date,
         'total_orders': total_orders,
-        'total_revenue': total_revenue,
-        'average_order_value': average_order_value,
+        'total_revenue': float(total_revenue),
+        'average_order_value': float(average_order_value),
         'total_items_sold': total_items_sold,
         'status_breakdown': status_breakdown,
-        'daily_sales': list(daily_sales),
+        'daily_sales': daily_sales,
     }
-
-
-def export_csv_report(report_type, start_date, end_date):
-    """
-    Export report data as CSV
-    """
-    import csv
-    from django.http import HttpResponse
-    
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="sales_report_{start_date}_{end_date}.csv"'
-    
-    writer = csv.writer(response)
-    
-    if report_type == 'sales':
-        # Sales report CSV
-        writer.writerow(['Date', 'Orders', 'Revenue', 'Items Sold'])
-        
-        orders = Order.objects.filter(
-            created_at__date__range=[start_date, end_date],
-            status='delivered'
-        ).extra(
-            select={'day': 'date(created_at)'}
-        ).values('day').annotate(
-            orders_count=Count('id'),
-            revenue=Sum('total_amount'),
-            items_sold=Sum('order_items__quantity')
-        ).order_by('day')
-        
-        for order in orders:
-            writer.writerow([
-                order['day'],
-                order['orders_count'],
-                order['revenue'],
-                order['items_sold'] or 0
-            ])
-    
-    return response
-
-
-def export_json_report(report_type, start_date, end_date):
-    """
-    Export report data as JSON
-    """
-    report_data = generate_sales_report(report_type, start_date, end_date, None)
-    
-    # Convert Decimal objects to strings for JSON serialization
-    def decimal_default(obj):
-        if isinstance(obj, Decimal):
-            return str(obj)
-        raise TypeError
-    
-    response = HttpResponse(
-        json.dumps(report_data, default=decimal_default, indent=2),
-        content_type='application/json'
-    )
-    response['Content-Disposition'] = f'attachment; filename="sales_report_{start_date}_{end_date}.json"'
-    
-    return response
-

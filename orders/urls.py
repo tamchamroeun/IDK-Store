@@ -15,5 +15,4 @@ urlpatterns = [
     path('admin/<uuid:order_id>/', views.admin_order_detail, name='admin_order_detail'),
     path('admin/<uuid:order_id>/update-status/', views.update_order_status, name='update_order_status'),
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
-   
 ]

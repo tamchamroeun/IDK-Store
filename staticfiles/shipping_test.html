@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipping Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .debug-section {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .debug-title {
+            color: #495057;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .debug-output {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .shipping-methods {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .shipping-method {
+            border: 3px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .shipping-method:hover {
+            border-color: #6c757d;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .shipping-method.selected {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            box-shadow: 0 5px 20px rgba(0,123,255,0.2);
+        }
+        
+        .shipping-method input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+        
+        .shipping-method label {
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .shipping-method .price {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .shipping-method .description {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .order-summary {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .summary-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-label {
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .summary-value {
+            font-weight: 600;
+            color: #212529;
+        }
+        
+        .summary-total {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 15px -25px -25px -25px;
+            padding: 20px 25px;
+            border-radius: 0 0 12px 12px;
+            font-size: 1.2em;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 3px 0;
+        }
+        
+        .log-timestamp {
+            color: #6c757d;
+            font-weight: bold;
+        }
+        
+        .update-animation {
+            animation: updatePulse 0.5s ease-in-out;
+        }
+        
+        @keyframes updatePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); background: #e3f2fd; }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚚 Shipping Method Test</h1>
+            <p>Testing shipping method selection and order total calculations</p>
+        </div>
+        
+        <div class="content">
+            <div class="debug-section">
+                <h3 class="debug-title">📊 Debug Console</h3>
+                <div class="debug-output" id="debug-output">
+                    <div class="log-entry">
+                        <span class="log-timestamp">[Ready]</span> Debug console initialized
+                    </div>
+                </div>
+            </div>
+            
+            <h2>📦 Select Shipping Method</h2>
+            <div class="shipping-methods">
+                <div class="shipping-method" data-cost="5.99">
+                    <input type="radio" name="shipping_method" value="1" id="shipping_1" checked>
+                    <label for="shipping_1">
+                        <div>
+                            <strong>📮 Standard Shipping</strong>
+                            <span class="price">$5.99</span>
+                        </div>
+                        <div class="description">5-7 business days delivery</div>
+                    </label>
+                </div>
+                
+                <div class="shipping-method" data-cost="12.99">
+                    <input type="radio" name="shipping_method" value="2" id="shipping_2">
+                    <label for="shipping_2">
+                        <div>
+                            <strong>⚡ Express Shipping</strong>
+                            <span class="price">$12.99</span>
+                        </div>
+                        <div class="description">2-3 business days delivery</div>
+                    </label>
+                </div>
+                
+                <div class="shipping-method" data-cost="19.99">
+                    <input type="radio" name="shipping_method" value="3" id="shipping_3">
+                    <label for="shipping_3">
+                        <div>
+                            <strong>🚀 Next Day Delivery</strong>
+                            <span class="price">$19.99</span>
+                        </div>
+                        <div class="description">Next business day delivery</div>
+                    </label>
+                </div>
+                
+                <div class="shipping-method" data-cost="0.00">
+                    <input type="radio" name="shipping_method" value="4" id="shipping_4">
+                    <label for="shipping_4">
+                        <div>
+                            <strong>🎁 Free Shipping</strong>
+                            <span class="price">$0.00</span>
+                        </div>
+                        <div class="description">7-10 business days delivery</div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="order-summary">
+                <h3 class="summary-title">💰 Order Summary</h3>
+                
+                <div class="summary-item">
+                    <span class="summary-label">Subtotal:</span>
+                    <span class="summary-value" id="subtotal">$99.99</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span class="summary-label">Shipping:</span>
+                    <span class="summary-value" id="shipping-cost">$0.00</span>
+                </div>
+                
+                <div class="summary-item" id="discount-row" style="display: none;">
+                    <span class="summary-label">Discount:</span>
+                    <span class="summary-value" id="discount-amount" style="color: #28a745;">-$0.00</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span class="summary-label">Tax (8%):</span>
+                    <span class="summary-value" id="tax-amount">$0.00</span>
+                </div>
+                
+                <div class="summary-item summary-total">
+                    <span class="summary-label">Total:</span>
+                    <span class="summary-value" id="grand-total">$99.99</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const shippingMethods = document.querySelectorAll('.shipping-method');
+        const shippingRadios = document.querySelectorAll('.shipping-method input[type="radio"]');
+        const debugOutput = document.getElementById('debug-output');
+        
+        function logDebug(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            
+            const colors = {
+                info: '#6c757d',
+                success: '#28a745',
+                warning: '#fd7e14',
+                error: '#dc3545'
+            };
+            
+            logEntry.innerHTML = `
+                <span class="log-timestamp" style="color: ${colors[type]}">[${timestamp}]</span> 
+                ${message}
+            `;
+            
+            debugOutput.appendChild(logEntry);
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+            
+            // Keep only last 20 entries
+            while (debugOutput.children.length > 20) {
+                debugOutput.removeChild(debugOutput.firstChild);
+            }
+        }
+        
+        function updateOrderTotals() {
+            const shippingMethodId = document.querySelector('input[name="shipping_method"]:checked')?.value;
+            
+            if (!shippingMethodId) {
+                logDebug('No shipping method selected', 'warning');
+                return;
+            }
+            
+            logDebug(`Updating totals for shipping method: ${shippingMethodId}`, 'info');
+            
+            // Get shipping cost from data attribute
+            const selectedMethod = document.querySelector(`input[name="shipping_method"][value="${shippingMethodId}"]`);
+            const methodDiv = selectedMethod.closest('.shipping-method');
+            const shippingCost = parseFloat(methodDiv.dataset.cost) || 0;
+            
+            logDebug(`Shipping cost extracted: $${shippingCost.toFixed(2)}`, 'success');
+            
+            // Calculate totals
+            const subtotal = 99.99;
+            const discount = 0;
+            const taxRate = 0.08;
+            const taxableAmount = subtotal + shippingCost - discount;
+            const tax = taxableAmount * taxRate;
+            const total = subtotal + shippingCost + tax - discount;
+            
+            logDebug(`Calculations: Subtotal($${subtotal}) + Shipping($${shippingCost}) + Tax($${tax.toFixed(2)}) = $${total.toFixed(2)}`, 'success');
+            
+            // Update display with animation
+            const summaryElement = document.querySelector('.order-summary');
+            summaryElement.classList.add('update-animation');
+            
+            setTimeout(() => {
+                document.getElementById('shipping-cost').textContent = `$${shippingCost.toFixed(2)}`;
+                document.getElementById('tax-amount').textContent = `$${tax.toFixed(2)}`;
+                document.getElementById('grand-total').textContent = `$${total.toFixed(2)}`;
+                
+                summaryElement.classList.remove('update-animation');
+                logDebug('Display updated successfully', 'success');
+            }, 100);
+        }
+        
+        // Event listeners for radio buttons
+        shippingRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                logDebug(`Radio button changed: ${this.value} (${this.checked ? 'checked' : 'unchecked'})`, 'info');
+                
+                // Update visual selection
+                const methodDiv = this.closest('.shipping-method');
+                shippingMethods.forEach(m => m.classList.remove('selected'));
+                methodDiv.classList.add('selected');
+                
+                logDebug(`Visual selection updated for method: ${this.value}`, 'success');
+                
+                // Update order totals
+                updateOrderTotals();
+            });
+            
+            radio.addEventListener('click', function(e) {
+                logDebug(`Radio button clicked: ${this.value}`, 'info');
+            });
+        });
+        
+        // Event listeners for container clicks
+        shippingMethods.forEach(method => {
+            method.addEventListener('click', function(e) {
+                logDebug(`Method container clicked. Target: ${e.target.tagName}`, 'info');
+                
+                if (e.target.tagName !== 'INPUT') {
+                    const radio = this.querySelector('input[type="radio"]');
+                    logDebug(`Programmatically selecting radio: ${radio.value}`, 'info');
+                    
+                    if (!radio.checked) {
+                        radio.checked = true;
+                        radio.dispatchEvent(new Event('change', {bubbles: true}));
+                    }
+                }
+            });
+        });
+        
+        // Initialize page
+        logDebug('Initializing shipping method selection...', 'info');
+        
+        // Set default selection
+        const checkedRadio = document.querySelector('.shipping-method input[type="radio"]:checked');
+        if (checkedRadio) {
+            logDebug(`Default radio found: ${checkedRadio.value}`, 'success');
+            checkedRadio.closest('.shipping-method').classList.add('selected');
+            updateOrderTotals();
+        } else {
+            logDebug('No default radio found', 'warning');
+        }
+        
+        logDebug('Initialization complete! Try clicking different shipping methods.', 'success');
+    </script>
+</body>
+</html>
