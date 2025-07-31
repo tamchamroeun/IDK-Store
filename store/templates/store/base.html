@@ -3,7 +3,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#6366f1">
     <title>{% block title %}IDK-Store{% endblock %}</title>
     <link rel="icon" type="image/png" href="{% static 'store/images/IDK.png' %}">
     <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
@@ -31,23 +36,59 @@
             height: 100%;
             margin: 0;
             padding: 0;
+            /* Safari iOS specific optimizations */
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
         }
+        
+        /* Safari iOS viewport height fix */
+        @supports (-webkit-touch-callout: none) {
+            html, body {
+                height: -webkit-fill-available;
+            }
+        }
+        
         body {
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             margin: 0;
             background: var(--background-main);
             font-family: 'Roboto', Arial, sans-serif;
             color: var(--text-main);
             font-size: 16px;
             line-height: 1.7;
+            /* Prevent overscroll bounce on iOS */
+            overscroll-behavior: none;
+            /* Smooth scrolling */
+            -webkit-overflow-scrolling: touch;
+        }
+        .container {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            padding: 20px;
         }
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0rem 2rem;
+            padding: 1rem 2rem;
             background: var(--nav-gradient) !important;
             box-shadow: 0 2px 8px rgba(90, 40, 180, 0.08);
+            position: relative;
+            /* Mobile Safari safe area */
+            padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+            padding-left: calc(2rem + env(safe-area-inset-left, 0px));
+            padding-right: calc(2rem + env(safe-area-inset-right, 0px));
+            /* Performance optimization */
+            will-change: transform;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
         }
         .logo {
             display: flex;
@@ -58,6 +99,7 @@
             letter-spacing: 1px;
             gap: 8px;
             text-decoration: none;
+            -webkit-user-select: none;
             user-select: none;
             font-family: 'Roboto', Arial, sans-serif;
         }
@@ -77,6 +119,7 @@
             height: 42px;
             object-fit: contain;
         }
+      
         nav ul {
             display: flex;
             list-style: none;
@@ -91,15 +134,33 @@
             text-decoration: none;
             color: var(--text-light);
             font-weight: 600;
-            transition: color 0.25s;
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
-            padding: 6px 0;
+            padding: 8px 12px;
             gap: 8px;
             font-family: 'Roboto', Arial, sans-serif;
+            border-radius: 6px;
+            /* Better touch targets for mobile */
+            min-height: 44px;
+            min-width: 44px;
+            justify-content: center;
+            /* Prevent text selection on mobile */
+            -webkit-user-select: none;
+            user-select: none;
+            /* Better mobile interaction */
+            -webkit-tap-highlight-color: transparent;
         }
+        
         nav ul li a:hover, nav ul li a:focus {
             color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        nav ul li a:active {
+            transform: translateY(0);
+            background: rgba(255, 255, 255, 0.2);
         }
         .dropdown .dropdown-content {
             display: none;
@@ -192,6 +253,7 @@
             align-items: center;
             cursor: pointer;
             height: 32px;
+            margin-left: 12px;
         }
         .account-dropdown .account-btn {
             display: flex;
@@ -320,23 +382,134 @@
             background: none;
             border: none;
             color: var(--text-light);
-            font-size: 2rem;
+            font-size: 1.5rem;
             cursor: pointer;
-            margin-left: 1rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background 0.2s;
         }
+        .nav-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Image responsiveness */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Touch device improvements */
+        @media (hover: none) and (pointer: coarse) {
+            nav ul li a {
+                padding: 12px 16px;
+                min-height: 20px;
+                display: flex;
+                align-items: center;
+            }
+            .auth-btns .login, .auth-btns .register {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .account-btn {
+                min-height: 44px;
+            }
+        }
+        
+        /* Safari iOS specific optimizations */
+        nav, .nav-container, .account-dropdown, .auth-btns {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+        
+        .nav-toggle, .account-btn, .auth-btns a {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        /* Chrome mobile specific optimizations */
+        nav ul {
+            scroll-behavior: smooth;
+        }
+        
+        .dropdown-content {
+            will-change: transform, opacity;
+        }
+        
+        /* Mobile authentication navigation items (hidden by default on desktop) */
+        .mobile-auth-nav {
+            display: none;
+        }
+        
+        .mobile-auth-nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Roboto', Arial, sans-serif;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.2s ease;
+        }
+        
+        .mobile-auth-nav a:active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Desktop and Large Screens */
+        @media (min-width: 900px) {
+            
+            .container {
+                max-width: 1200px;
+                padding: 24px;
+            }
+            nav {
+                padding: 1.25rem 6rem;
+                max-height: 65px !important;
+                
+            }
+            .logo {
+                font-size: 1.8rem;
+            }
+            #mainNav {
+                
+                min-width: fit-content;
+            }
+        }
+        
+        /* Tablet and Medium Screens */
         @media (max-width: 900px) {
             .container {
                 max-width: 95vw;
-                padding: 16px 8px;
+                padding: 16px 12px;
             }
             nav {
-                padding: 1rem 1rem;
+                padding: 1rem 1.5rem;
+                
+            }
+            .logo {
+                font-size: 1.4rem;
+            }
+            nav ul {
+                gap: 15px;
+            }
+            nav ul li a {
+                font-size: 0.95rem;
+            }
+            #mainNav {
+                min-width: fit-content;
             }
         }
+        
         @media (max-width: 700px) {
             nav {
                 flex-wrap: wrap;
-                padding: 0.5rem 0.5rem;
+                padding: 1rem 1rem;
             }
             .auth-nav {
                 margin-top: 10px;
@@ -344,19 +517,40 @@
             .container {
                 padding: 10px 2vw;
             }
+            .logo {
+                font-size: 1.3rem;
+            }
+            nav ul li a {
+                font-size: 0.9rem;
+                padding: 8px 6px;
+            }
+            .auth-btns .login, .auth-btns .register {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
         }
+        
         @media (max-width: 600px) {
             nav {
                 flex-direction: column;
                 align-items: flex-start;
-                padding: 0.5rem 0.5rem;
+                padding: 1rem;
+                position: relative;
+            }
+            .nav-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
             }
             .logo {
-                margin-bottom: 8px;
+                margin-bottom: 0;
             }
             .nav-toggle {
                 display: block;
-                align-self: flex-end;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
             }
             nav ul {
                 flex-direction: column;
@@ -365,36 +559,204 @@
                 display: none;
                 background: var(--nav-gradient);
                 margin-bottom: 0;
+                margin-top: 1rem;
+                border-radius: var(--border-radius);
+                overflow: hidden;
             }
             nav ul.open {
                 display: flex;
-                
+                animation: slideDown 0.3s ease-out;
             }
             nav ul li {
                 width: 100%;
             }
             nav ul li a {
-                padding: 12px 8px;
+                padding: 12px 16px;
+                width: 100%;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                transition: background 0.2s ease;
+            }
+            nav ul li a:active {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            nav ul li:last-child a {
+                border-bottom: none;
+            }
+            
+            /* Show mobile auth navigation in the menu */
+            .mobile-auth-nav {
+                display: list-item;
                 width: 100%;
             }
+            
+            .mobile-auth-nav a {
+                padding: 12px 16px;
+                width: 100%;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                transition: background 0.2s ease;
+                color: var(--text-light);
+                text-decoration: none;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-family: 'Roboto', Arial, sans-serif;
+                background: var(--nav-gradient);
+            }
+            
+            .mobile-auth-nav a:active {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            .mobile-auth-nav:last-child a {
+                border-bottom: none;
+            }
+            
             .dropdown .dropdown-content {
                 position: static;
                 min-width: unset;
                 box-shadow: none;
                 border-radius: 0;
-                background: #fff;
+                background: rgba(255, 255, 255, 0.1);
+                margin-left: 0;
             }
             .dropdown-content a {
                 padding-left: 30px;
+                color: var(--text-light);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             }
+            .dropdown-content a:hover,
+            .dropdown-content a:active {
+                background: rgba(255, 255, 255, 0.15);
+            }
+            
+            /* Hide desktop auth nav on mobile */
             .auth-nav {
-                width: 100%;
-                justify-content: flex-start;
-                margin-top: 8px;
+                display: none;
             }
+            
             .account-dropdown-content {
                 right: 0;
                 left: auto;
+                top: 100%;
+                min-width: 250px;
+            }
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            nav {
+                padding: 0.75rem;
+            }
+            .logo {
+                font-size: 1.2rem;
+            }
+            .logo-icon img {
+                width: 36px;
+                height: 36px;
+            }
+            nav ul li a {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+            .dropdown-content a {
+                padding: 10px 12px;
+                padding-left: 24px;
+            }
+            .auth-btns .login, .auth-btns .register {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            .account-dropdown-content {
+                width: 200px !important;
+            }
+            .container {
+                padding: 8px 1.5vw;
+            }
+        }
+        
+        /* Extra small devices (320px and up) */
+        @media (max-width: 320px) {
+            .container {
+                padding: 8px 4vw;
+            }
+            .logo {
+                font-size: 1.1rem;
+            }
+            .logo-icon img {
+                width: 32px;
+                height: 32px;
+            }
+            nav ul li a {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+            .auth-btns .login, .auth-btns .register {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            .account-dropdown-content {
+                min-width: 200px;
+            }
+        }
+        
+        /* Landscape phone orientation */
+        @media (max-height: 500px) and (orientation: landscape) and (max-width: 900px) {
+            nav {
+                padding: 0.5rem 1rem;
+            }
+            .logo {
+                font-size: 1.2rem;
+            }
+            .nav-toggle {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+            nav ul {
+                margin-top: 0.5rem;
+            }
+            nav ul li a {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            .auth-nav {
+                margin-top: 0.5rem;
+                padding-top: 0.5rem;
+            }
+            .container {
+                padding: 8px 2vw;
+            }
+        }
+        
+        /* High DPI screens optimization */
+        @media (-webkit-min-device-pixel-ratio: 2),
+               (min-resolution: 192dpi) {
+            .logo-icon img {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+        }
+        
+        /* Reduce motion for users who prefer it */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .slideDown {
+                animation: none;
             }
         }
         h1, h2, h3, h4 {
@@ -415,13 +777,15 @@
 <body>
     <header>
         <nav>
-            <a href="{% url 'store:home' %}" class="logo">
-                <span class="logo-icon">
-                    <img src="{% static 'store/images/IDK.png' %}" alt="Logo" />
-                </span>
-                - Store
-            </a>
-            <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-controls="mainNav" aria-expanded="false"><i class="fa fa-bars"></i></button>
+            <div class="nav-container">
+                <a href="{% url 'store:home' %}" class="logo">
+                    <span class="logo-icon">
+                        <img src="{% static 'store/images/IDK.png' %}" alt="Logo" />
+                    </span>
+                    - Store
+                </a>
+                <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-controls="mainNav" aria-expanded="false"><i class="fa fa-bars"></i></button>
+            </div>
             <ul id="mainNav">
                 <li><a href="{% url 'store:home' %}"><i class="fa fa-home"></i><span>Home</span></a></li>
                 <li class="dropdown" tabindex="0">
@@ -435,7 +799,7 @@
                     </div>
                 </li>
                 <li class="dropdown" tabindex="0">
-                    {% if user.is_authenticated %}
+                    {% if user.profile.role == 'customer' %}
                     <a href="#"><i class="fa fa-shopping-cart"></i><span>Shopping</span><i class="fa fa-caret-down"></i></a>
                     <div class="dropdown-content">
                         <a href="{% url 'cart:cart_view' %}"><i class="fa fa-shopping-basket"></i><span>View Cart</span></a>
@@ -443,8 +807,6 @@
                         <a href="{% url 'payment:order_list' %}"><i class="fa fa-history"></i><span>Order History</span></a>
 
                     </div>
-                    {% else %}
-                    <a href="{% url 'accounts:login' %}"><i class="fa fa-shopping-cart"></i><span>Shopping</span></a>
                     {% endif %}
                 </li>
                 {% if user.profile.role == 'staff' or user.profile.role == 'owner' %}
@@ -466,11 +828,40 @@
                     </div>
                 </li>
                 {% endif %}
+                
+                <!-- Mobile authentication navigation (only visible on mobile) -->
+                {% if not user.is_authenticated %}
+                <li class="mobile-auth-nav">
+                    <a href="{% url 'accounts:login' %}">
+                        <i class="fa fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </a>
+                </li>
+                <li class="mobile-auth-nav">
+                    <a href="{% url 'accounts:register' %}">
+                        <i class="fa fa-user-plus"></i>
+                        <span>Register</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="mobile-auth-nav">
+                    <a href="{% url 'accounts:profile' %}">
+                        <i class="fa fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="mobile-auth-nav">
+                    <a href="{% url 'accounts:logout' %}" onclick="return confirm('Are you sure, you want to logout?')">
+                        <i class="fa fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+                {% endif %}
             </ul>
             <div class="auth-nav">
                 {% if user.is_authenticated %}
-                <div class="account-dropdown" tabindex="0" style="margin-left: 12px;">
-                    <div class="account-btn" aria-haspopup="true" aria-expanded="false" onclick="this.parentElement.classList.toggle('open');">
+                <div class="account-dropdown" tabindex="0">
+                    <div class="account-btn" aria-haspopup="true" onclick="this.parentElement.classList.toggle('open');">
                         {% if user.profile.profile_picture %}
                             <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="user-avatar">
                         {% else %}
@@ -525,41 +916,113 @@
         </div>
     </main>
     <script>
-        // Hamburger menu logic for accessibility (optional)
+        // Enhanced hamburger menu logic with better mobile support
         const navToggle = document.getElementById('navToggle');
         const mainNav = document.getElementById('mainNav');
-        navToggle && navToggle.addEventListener('click', () => {
-            mainNav.classList.toggle('open');
-            navToggle.setAttribute('aria-expanded', mainNav.classList.contains('open') ? "true" : "false");
-        });
+        
+        if (navToggle && mainNav) {
+            // Add touch event support for better mobile responsiveness
+            navToggle.addEventListener('click', handleNavToggle);
+            navToggle.addEventListener('touchstart', handleNavToggle, { passive: true });
+            
+            function handleNavToggle(e) {
+                e.preventDefault();
+                mainNav.classList.toggle('open');
+                const isOpen = mainNav.classList.contains('open');
+                navToggle.setAttribute('aria-expanded', isOpen ? "true" : "false");
+                
+                // Prevent scroll when mobile menu is open
+                if (isOpen) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+        }
 
-        // Simple close for account dropdown on outside click
+        // Enhanced account dropdown with touch support
         document.addEventListener('click', function(e) {
             document.querySelectorAll('.account-dropdown').forEach(function(dd){
-                if (!dd.contains(e.target)) dd.classList.remove('open');
+                if (!dd.contains(e.target)) {
+                    dd.classList.remove('open');
+                }
             });
         });
 
-        // For mobile: close nav if clicking outside
+        // Touch event for account dropdown
+        document.addEventListener('touchstart', function(e) {
+            document.querySelectorAll('.account-dropdown').forEach(function(dd){
+                if (!dd.contains(e.target)) {
+                    dd.classList.remove('open');
+                }
+            });
+        }, { passive: true });
+
+        // Enhanced mobile nav close functionality
         document.addEventListener('click', function(e) {
-            if (navToggle && !navToggle.contains(e.target) && !mainNav.contains(e.target)) {
+            if (navToggle && mainNav && !navToggle.contains(e.target) && !mainNav.contains(e.target)) {
                 mainNav.classList.remove('open');
                 navToggle.setAttribute('aria-expanded', "false");
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Close mobile nav when clicking on nav items (better UX)
+        if (mainNav) {
+            mainNav.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A' && window.innerWidth <= 600) {
+                    setTimeout(() => {
+                        mainNav.classList.remove('open');
+                        if (navToggle) navToggle.setAttribute('aria-expanded', "false");
+                        document.body.style.overflow = '';
+                    }, 150); // Small delay for better UX
+                }
+            });
+        }
+
+        // Handle window resize to close mobile menu and restore scroll
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 600 && mainNav && navToggle) {
+                mainNav.classList.remove('open');
+                navToggle.setAttribute('aria-expanded', "false");
+                document.body.style.overflow = '';
             }
         });
 
-        // Fade out and remove Django messages after 2 seconds
-    document.addEventListener('DOMContentLoaded', function() {  
-    setTimeout(function() {
-        document.querySelectorAll('.messages, .alert, .message').forEach(function(msg) {
-            msg.style.transition = "opacity 0.5s";
-            msg.style.opacity = 0;
+        // Enhanced message handling with better mobile support
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle orientation change for mobile devices
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    if (mainNav && navToggle && window.innerWidth <= 600) {
+                        mainNav.classList.remove('open');
+                        navToggle.setAttribute('aria-expanded', "false");
+                        document.body.style.overflow = '';
+                    }
+                }, 500);
+            });
+            
+            // Auto-hide messages with fade effect
             setTimeout(function() {
-                if (msg.parentNode) msg.parentNode.removeChild(msg);
-            }, 500); // Remove after fade out
+                document.querySelectorAll('.messages, .alert, .message').forEach(function(msg) {
+                    msg.style.transition = "opacity 0.5s ease";
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        if (msg.parentNode) msg.parentNode.removeChild(msg);
+                    }, 500);
+                });
+            }, 3000);
         });
-        }, 2000); // 2 seconds
-    });
+
+        // Viewport height fix for mobile browsers (Safari iOS)
+        function setVH() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        setVH();
+        window.addEventListener('resize', setVH);
+        window.addEventListener('orientationchange', setVH);
     </script>
 </body>
 </html>
