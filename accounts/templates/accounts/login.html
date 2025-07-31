@@ -491,29 +491,29 @@
         }
     }
 
-    /* Dark mode support (if needed) */
+    /* Light mode only - no dark backgrounds */
     @media (prefers-color-scheme: dark) {
         .auth-container {
-            background: rgba(17, 24, 39, 0.95);
-            border-color: rgba(75, 85, 99, 0.3);
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .auth-header h1 {
-            color: var(--gray-100);
+            color: var(--gray-900);
         }
 
         .auth-header p {
-            color: var(--gray-400);
+            color: var(--gray-600);
         }
 
         .form-group label {
-            color: var(--gray-300);
+            color: var(--gray-700);
         }
 
         .form-control {
-            background: var(--gray-800);
-            border-color: var(--gray-600);
-            color: var(--gray-100);
+            background: var(--white);
+            border-color: var(--gray-200);
+            color: var(--gray-900);
         }
 
         .form-control:focus {
@@ -521,11 +521,11 @@
         }
 
         .auth-links p {
-            color: var(--gray-400);
+            color: var(--gray-600);
         }
 
         .social-divider span {
-            background: var(--gray-800);
+            background: var(--white);
         }
     }
 </style>

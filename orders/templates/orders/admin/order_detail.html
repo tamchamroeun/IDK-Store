@@ -71,12 +71,14 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    text-align: center;
 }
 
 .admin-header p {
     opacity: 0.9;
     font-size: 1rem;
     margin: 0;
+    color: #fff;
 }
 
 .header-content {
@@ -504,8 +506,8 @@ body {
 
 .btn-outline-primary {
     background: transparent;
-    color: var(--primary);
-    border: 1px solid var(--primary);
+    color: #c20202;
+    border: 1px solid #c20202;
 }
 
 .btn-outline-primary:hover {
@@ -516,12 +518,12 @@ body {
 
 .btn-outline-secondary {
     background: transparent;
-    color: var(--gray);
-    border: 1px solid var(--gray);
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
 }
 
 .btn-outline-secondary:hover {
-    background: var(--gray);
+    background: #f59e0b;
     color: white;
     transform: translateY(-1px);
 }
@@ -658,8 +660,9 @@ body {
     <div class="admin-header" role="banner">
         <div class="header-content">
             <div>
-                <h1 tabindex="0"><i class="fas fa-receipt me-2"></i>Order Details</h1>
+                <h1 tabindex="0"><i class="fas fa-receipt me-2"></i> Order Details</h1>
                 <p class="mb-0">Order ID: <code>{{ order.order_id }}</code></p>
+                  
             </div>
             <div class="action-buttons no-print" role="navigation" aria-label="Order actions">
                 <a href="{% url 'orders:admin_order_list' %}" class="btn btn-outline-secondary" title="Back to Orders">

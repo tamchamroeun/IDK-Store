@@ -2,45 +2,1134 @@
 
 {% block title %}Edit {{ product.name }} - E-commerce App{% endblock %}
 
-{% block content %}
-<h1>Edit Product</h1>
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #667eea;
+        --primary-hover: #5a6fd8;
+        --secondary-color: #764ba2;
+        --success-color: #10b981;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --info-color: #3b82f6;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --white: #ffffff;
+        --whitesmoke: #f5f5f5;
+        --border-radius: 0.75rem;
+        --border-radius-lg: 1rem;
+        --border-radius-xl: 1.5rem;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    }
 
-<div class="form-container" style="max-width: 520px; margin: 0 auto;">
-    <form method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.2rem;">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div style="margin-top: 1.2rem; text-align: center;">
-            <h3 style="margin-bottom: 0.7rem;">Current Image:</h3>
-            {% if product.image %}
-                <img id="preview-image" src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 200px; border-radius: 8px; box-shadow: 0 2px 10px 0 rgba(40,40,90,0.10); margin-left: auto; margin-right: auto; display: block;">
-            {% else %}
-                <img id="preview-image" src="" alt="No image" style="display:none; max-width: 200px; border-radius: 8px; margin-left: auto; margin-right: auto; display: block;">
-            {% endif %}
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--whitesmoke);
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        padding: 0;
+        margin: 0;
+        color: var(--gray-900);
+    }
+
+    .edit-product-wrapper {
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        background: var(--whitesmoke);
+    }
+
+    .edit-product-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: var(--white);
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+        animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .edit-product-header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .edit-product-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .edit-product-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.025em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .edit-product-header .icon {
+        width: 3rem;
+        height: 3rem;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .edit-product-body {
+        padding: 2.5rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin: 0 0 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        background: var(--white);
+        font-size: 1rem;
+        color: var(--gray-900);
+        transition: var(--transition);
+        outline: none;
+        font-family: inherit;
+        resize: vertical;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-control:hover {
+        border-color: var(--gray-300);
+    }
+
+    .form-control::placeholder {
+        color: var(--gray-400);
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+    }
+
+    .file-upload-section {
+        background: var(--gray-50);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        text-align: center;
+        border: 2px dashed var(--gray-200);
+        transition: var(--transition);
+    }
+
+    .file-upload-section:hover {
+        border-color: var(--primary-color);
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .current-image-wrapper {
+        margin-bottom: 1.5rem;
+    }
+
+    .current-image-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .image-preview {
+        max-width: 250px;
+        width: 100%;
+        height: auto;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-lg);
+        margin: 0 auto;
+        display: block;
+        transition: var(--transition);
+    }
+
+    .image-preview:hover {
+        transform: scale(1.02);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .no-image-placeholder {
+        width: 250px;
+        height: 200px;
+        background: var(--gray-100);
+        border: 2px dashed var(--gray-300);
+        border-radius: var(--border-radius-lg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-400);
+        font-size: 0.875rem;
+        margin: 0 auto;
+    }
+
+    .no-image-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .file-input {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
+    }
+
+    .file-input-label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 600;
+        transition: var(--transition);
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .file-input-label:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border: none;
+        min-width: 140px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow);
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-xl);
+        text-decoration: none;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: var(--white);
+        color: var(--gray-700);
+        border: 2px solid var(--gray-200);
+    }
+
+    .btn-secondary:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-300);
+        transform: translateY(-1px);
+        text-decoration: none;
+        color: var(--gray-800);
+    }
+
+    .btn-danger {
+        background: var(--danger-color);
+        color: white;
+        box-shadow: var(--shadow);
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-xl);
+        text-decoration: none;
+        color: white;
+    }
+
+    /* Form styling enhancements */
+    .form-group p {
+        margin: 0;
+    }
+
+    .form-group p label {
+        margin-bottom: 0.5rem;
+    }
+
+    .helptext {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+    }
+
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0 0;
+        font-size: 0.875rem;
+        color: var(--danger-color);
+        background: rgba(239, 68, 68, 0.1);
+        padding: 0.75rem;
+        border-radius: var(--border-radius);
+        border-left: 4px solid var(--danger-color);
+    }
+
+    /* Responsive Design */
+    @media (min-width: 768px) {
+        .form-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .action-buttons {
+            justify-content: flex-end;
+        }
+
+        .edit-product-header h1 {
+            font-size: 2.5rem;
+        }
+
+        /* Desktop layout improvements */
+        .edit-product-body {
+            padding: 3rem;
+        }
+
+        .desktop-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .form-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .image-sidebar {
+            position: sticky;
+            top: 2rem;
+            background: var(--gray-50);
+            border-radius: var(--border-radius-xl);
+            padding: 2rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .image-sidebar .section-title {
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 0.75rem;
+        }
+
+        .desktop-image-preview {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .desktop-no-image-placeholder {
+            width: 100%;
+            height: 250px;
+        }
+
+        .desktop-file-input-wrapper {
+            margin-top: 1.5rem;
+        }
+
+        .desktop-action-buttons {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .desktop-action-buttons .btn {
+            width: 100%;
+            min-width: auto;
+        }
+
+        /* Hide mobile image section on desktop */
+        .mobile-image-section {
+            display: none;
+        }
+
+        /* Hide mobile action buttons on desktop */
+        .mobile-action-buttons {
+            display: none;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .edit-product-container {
+            max-width: 1200px;
+        }
+
+        .desktop-layout {
+            grid-template-columns: 2.5fr 1fr;
+            gap: 4rem;
+        }
+
+        .edit-product-body {
+            padding: 4rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .edit-product-wrapper {
+            padding: 1rem 0.75rem;
+        }
+
+        .edit-product-header {
+            padding: 1.5rem;
+        }
+
+        .edit-product-header h1 {
+            font-size: 1.75rem;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .edit-product-header .icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 1rem;
+        }
+
+        .edit-product-body {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        /* Show mobile layout only */
+        .desktop-layout {
+            display: none;
+        }
+
+        .mobile-image-section {
+            display: block;
+        }
+
+        .mobile-action-buttons {
+            display: block;
+        }
+
+        /* Mobile-specific form layout */
+        .mobile-image-section .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .mobile-image-section .form-section:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .edit-product-wrapper {
+            padding: 0.5rem;
+        }
+
+        .edit-product-container {
+            border-radius: var(--border-radius);
+        }
+
+        .edit-product-header {
+            padding: 1rem;
+        }
+
+        .edit-product-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .edit-product-body {
+            padding: 1rem;
+        }
+
+        .form-control {
+            padding: 0.875rem 1rem;
+        }
+
+        .file-upload-section {
+            padding: 1.5rem 1rem;
+        }
+
+        .image-preview {
+            max-width: 200px;
+        }
+
+        .no-image-placeholder {
+            width: 200px;
+            height: 150px;
+        }
+    }
+
+    /* Enhanced animations */
+    @media (prefers-reduced-motion: no-preference) {
+        .form-control:focus {
+            animation: focusGlow 0.3s ease-out;
+        }
+
+        @keyframes focusGlow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+        }
+    }
+
+    /* Touch device enhancements */
+    @media (hover: none) and (pointer: coarse) {
+        .btn {
+            padding: 1.25rem 2rem;
+        }
+
+        .form-control {
+            padding: 1.125rem 1.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-product-wrapper">
+    <div class="edit-product-container">
+        <div class="edit-product-header">
+            <h1>
+                <span class="icon">
+                    <i class="fas fa-edit"></i>
+                </span>
+                Edit Product
+            </h1>
         </div>
-        <div style="align-self: center; display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem;">
-            <button type="submit" class="btn btn-primary">Update</button>
-            <a href="{% url 'products:product_detail' product.id %}" class="btn btn-secondary">Cancel</a>
-            <a href="{% url 'store:dashboard' %}" class="btn btn-secondary">Back</a>
+        
+        <div class="edit-product-body">
+            <form method="post" enctype="multipart/form-data" id="edit-product-form">
+                {% csrf_token %}
+                
+                <!-- Desktop Layout -->
+                <div class="desktop-layout">
+                    <div class="form-sections">
+                        <div class="form-section">
+                            <h2 class="section-title">
+                                <i class="fas fa-info-circle"></i>
+                                Product Information
+                            </h2>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    {{ form.name.label_tag }}
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in form.name.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                    {% if form.name.help_text %}
+                                        <div class="helptext">{{ form.name.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group">
+                                    {{ form.price.label_tag }}
+                                    {{ form.price }}
+                                    {% if form.price.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in form.price.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                    {% if form.price.help_text %}
+                                        <div class="helptext">{{ form.price.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if form.category %}
+                                <div class="form-group">
+                                    {{ form.category.label_tag }}
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in form.category.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                    {% if form.category.help_text %}
+                                        <div class="helptext">{{ form.category.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                {% if form.stock_quantity %}
+                                <div class="form-group">
+                                    {{ form.stock_quantity.label_tag }}
+                                    {{ form.stock_quantity }}
+                                    {% if form.stock_quantity.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in form.stock_quantity.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                    {% if form.stock_quantity.help_text %}
+                                        <div class="helptext">{{ form.stock_quantity.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="form-group full-width">
+                                    {{ form.description.label_tag }}
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in form.description.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                    {% if form.description.help_text %}
+                                        <div class="helptext">{{ form.description.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Add any additional form fields here -->
+                        {% for field in form %}
+                            {% if field.name not in 'name,price,category,stock_quantity,description,image' %}
+                                <div class="form-section">
+                                    <div class="form-group">
+                                        {{ field.label_tag }}
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <ul class="errorlist">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                                        {% endif %}
+                                        {% if field.help_text %}
+                                            <div class="helptext">{{ field.help_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Desktop Sidebar -->
+                    <div class="image-sidebar">
+                        <h2 class="section-title">
+                            <i class="fas fa-image"></i>
+                            Product Image
+                        </h2>
+                        
+                        <div class="current-image-wrapper">
+                            {% if product.image %}
+                                <img id="desktop-preview-image" src="{{ product.image.url }}" alt="{{ product.name }}" class="image-preview desktop-image-preview">
+                            {% else %}
+                                <div id="desktop-preview-image" class="no-image-placeholder desktop-no-image-placeholder">
+                                    <i class="fas fa-image no-image-icon"></i>
+                                    <div>No image uploaded</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="file-input-wrapper desktop-file-input-wrapper">
+                            {{ form.image.label_tag }}
+                            <label for="{{ form.image.id_for_label }}" class="file-input-label">
+                                <i class="fas fa-upload"></i>
+                                Choose New Image
+                            </label>
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                                <ul class="errorlist">{% for error in form.image.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                            {% endif %}
+                            {% if form.image.help_text %}
+                                <div class="helptext">{{ form.image.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="desktop-action-buttons">
+                            <button type="submit" class="btn btn-primary" id="desktop-update-btn">
+                                <i class="fas fa-save"></i>
+                                <span>Update Product</span>
+                            </button>
+                            <a href="{% url 'products:product_detail' product.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>
+                                <span>Cancel</span>
+                            </a>
+                            <a href="{% url 'store:dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Back to Dashboard</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Layout (Hidden on Desktop) -->
+                <div class="mobile-image-section">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-image"></i>
+                            Product Image
+                        </h2>
+                        <div class="file-upload-section">
+                            <div class="current-image-wrapper">
+                                <h3 class="current-image-title">
+                                    <i class="fas fa-image"></i>
+                                    Current Image
+                                </h3>
+                                {% if product.image %}
+                                    <img id="mobile-preview-image" src="{{ product.image.url }}" alt="{{ product.name }}" class="image-preview">
+                                {% else %}
+                                    <div id="mobile-preview-image" class="no-image-placeholder">
+                                        <i class="fas fa-image no-image-icon"></i>
+                                        <div>No image uploaded</div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="file-input-wrapper">
+                                {{ form.image.label_tag }}
+                                <label for="{{ form.image.id_for_label }}" class="file-input-label">
+                                    <i class="fas fa-upload"></i>
+                                    Choose New Image
+                                </label>
+                                {{ form.image }}
+                                {% if form.image.errors %}
+                                    <ul class="errorlist">{% for error in form.image.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                                {% endif %}
+                                {% if form.image.help_text %}
+                                    <div class="helptext">{{ form.image.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mobile-action-buttons">
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary" id="mobile-update-btn">
+                            <i class="fas fa-save"></i>
+                            <span>Update Product</span>
+                        </button>
+                        <a href="{% url 'products:product_detail' product.id %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>
+                            <span>Cancel</span>
+                        </a>
+                        <a href="{% url 'store:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Back to Dashboard</span>
+                        </a>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var input = document.getElementById('id_image');
-    var preview = document.getElementById('preview-image');
-    if (input && preview) {
-        input.addEventListener('change', function(event) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
+    // Image preview functionality for both desktop and mobile
+    const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+    const desktopPreviewImage = document.getElementById('desktop-preview-image');
+    const mobilePreviewImage = document.getElementById('mobile-preview-image');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
                 reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(input.files[0]);
+                    // Update desktop preview
+                    if (desktopPreviewImage) {
+                        if (desktopPreviewImage.tagName === 'IMG') {
+                            desktopPreviewImage.src = e.target.result;
+                            desktopPreviewImage.style.display = 'block';
+                        } else {
+                            // Replace placeholder with actual image
+                            const img = document.createElement('img');
+                            img.id = 'desktop-preview-image';
+                            img.src = e.target.result;
+                            img.alt = 'Preview';
+                            img.className = 'image-preview desktop-image-preview';
+                            desktopPreviewImage.parentNode.replaceChild(img, desktopPreviewImage);
+                        }
+                    }
+                    
+                    // Update mobile preview
+                    if (mobilePreviewImage) {
+                        if (mobilePreviewImage.tagName === 'IMG') {
+                            mobilePreviewImage.src = e.target.result;
+                            mobilePreviewImage.style.display = 'block';
+                        } else {
+                            // Replace placeholder with actual image
+                            const img = document.createElement('img');
+                            img.id = 'mobile-preview-image';
+                            img.src = e.target.result;
+                            img.alt = 'Preview';
+                            img.className = 'image-preview';
+                            mobilePreviewImage.parentNode.replaceChild(img, mobilePreviewImage);
+                        }
+                    }
+                };
+                reader.readAsDataURL(file);
             }
         });
     }
+    
+    // Form submission with loading state for both buttons
+    const form = document.getElementById('edit-product-form');
+    const desktopUpdateBtn = document.getElementById('desktop-update-btn');
+    const mobileUpdateBtn = document.getElementById('mobile-update-btn');
+    
+    function handleFormSubmission(btn) {
+        if (btn) {
+            btn.disabled = true;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Updating...</span>';
+            
+            // Re-enable button after 10 seconds as fallback
+            setTimeout(function() {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }, 10000);
+        }
+    }
+    
+    if (form) {
+        form.addEventListener('submit', function() {
+            handleFormSubmission(desktopUpdateBtn);
+            handleFormSubmission(mobileUpdateBtn);
+        });
+    }
+    
+    // Enhanced form interactions
+    const formControls = document.querySelectorAll('.form-control');
+    
+    formControls.forEach(control => {
+        // Add floating label effect
+        control.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        control.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+        
+        // Initialize state
+        if (control.value) {
+            control.parentElement.classList.add('focused');
+        }
+        
+        // Auto-resize textareas
+        if (control.tagName.toLowerCase() === 'textarea') {
+            control.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            // Initialize height
+            control.style.height = 'auto';
+            control.style.height = (control.scrollHeight) + 'px';
+        }
+    });
+    
+    // Enhanced mobile interactions
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        const interactiveElements = document.querySelectorAll('.btn, .file-input-label');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+    }
+    
+    // Form validation enhancements
+    const requiredInputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+    
+    requiredInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            const isValid = this.checkValidity();
+            this.classList.toggle('is-valid', isValid && this.value);
+            this.classList.toggle('is-invalid', !isValid && this.value);
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                const isValid = this.checkValidity();
+                this.classList.toggle('is-valid', isValid);
+                this.classList.toggle('is-invalid', !isValid);
+            }
+        });
+    });
+    
+    // Real-time character count for description
+    const descriptionField = document.querySelector('textarea[name="description"]');
+    if (descriptionField) {
+        const maxLength = descriptionField.getAttribute('maxlength');
+        if (maxLength) {
+            const charCount = document.createElement('div');
+            charCount.className = 'char-count';
+            charCount.style.cssText = 'font-size: 0.75rem; color: var(--gray-500); text-align: right; margin-top: 0.25rem;';
+            
+            function updateCharCount() {
+                const remaining = maxLength - descriptionField.value.length;
+                charCount.textContent = `${descriptionField.value.length}/${maxLength} characters`;
+                charCount.style.color = remaining < 50 ? 'var(--warning-color)' : 'var(--gray-500)';
+            }
+            
+            descriptionField.parentNode.appendChild(charCount);
+            descriptionField.addEventListener('input', updateCharCount);
+            updateCharCount();
+        }
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+S to save
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            const activeBtn = window.innerWidth >= 768 ? desktopUpdateBtn : mobileUpdateBtn;
+            if (activeBtn && !activeBtn.disabled) {
+                activeBtn.click();
+            }
+        }
+        
+        // Escape to cancel
+        if (e.key === 'Escape') {
+            const cancelBtn = document.querySelector('.btn-secondary');
+            if (cancelBtn) {
+                cancelBtn.click();
+            }
+        }
+    });
+    
+    // Sticky sidebar scroll behavior on desktop
+    if (window.innerWidth >= 768) {
+        const sidebar = document.querySelector('.image-sidebar');
+        const formSections = document.querySelector('.form-sections');
+        
+        if (sidebar && formSections) {
+            function updateSidebarHeight() {
+                const formHeight = formSections.offsetHeight;
+                const sidebarHeight = sidebar.offsetHeight;
+                const viewportHeight = window.innerHeight;
+                
+                if (sidebarHeight < viewportHeight - 100) {
+                    sidebar.style.position = 'sticky';
+                } else {
+                    sidebar.style.position = 'relative';
+                }
+            }
+            
+            updateSidebarHeight();
+            window.addEventListener('resize', updateSidebarHeight);
+        }
+    }
 });
 </script>
+
+<style>
+.is-valid {
+    border-color: var(--success-color) !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.is-invalid {
+    border-color: var(--danger-color) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.char-count {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    text-align: right;
+    margin-top: 0.25rem;
+}
+
+/* Custom file input styling */
+.form-control[type="file"] {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+}
+
+/* Focus states for accessibility */
+.file-input:focus + .file-input-label {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Loading state */
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Safari support */
+.edit-product-container {
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+</style>
 {% endblock %}
