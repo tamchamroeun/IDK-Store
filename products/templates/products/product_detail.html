@@ -72,6 +72,8 @@
         grid-template-columns: 1fr 1fr;
         gap: 0;
         min-height: 500px;
+        width: 100%;
+        max-width: 100%;
     }
     /* Image area */
     .product-image-area {
@@ -125,11 +127,16 @@
         padding: 2rem;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        gap: 1.5rem;
+        height: 100%;
+        justify-content: flex-start;
+        width: 100%;
+        min-width: 0; /* Allows flex items to shrink below their content size */
     }
 
     .product-header {
-        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
     }
 
     .product-name {
@@ -144,14 +151,15 @@
         font-size: clamp(1.25rem, 3vw, 2rem);
         font-weight: 800;
         color: var(--primary-color);
-        margin-bottom: 1.5rem;
+        margin: 0.5rem 0 0 0;
     }
 
     /* Product meta information */
     .product-meta {
         display: grid;
-        gap: 1rem;
-        margin-bottom: 2rem;
+        gap: 0.75rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
     }
 
     .meta-item {
@@ -203,26 +211,54 @@
 
     /* Description section */
     .product-description {
-        margin-bottom: 2rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+        width: 100%;
+        overflow: hidden;
     }
 
     .description-title {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 600;
         color: var(--text-primary);
-        margin-bottom: 1rem;
+        margin: 0 0 0.75rem 0;
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+        display: inline-block;
+        width: auto;
     }
 
     .description-text {
-        font-size: 1rem;
+        font-size: 0.95rem;
         line-height: 1.6;
         color: var(--text-secondary);
         margin: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        white-space: pre-wrap;
+        max-width: 100%;
+        display: block;
+        /* Handle very long strings without spaces */
+        -webkit-hyphens: auto;
+        -moz-hyphens: auto;
+        -ms-hyphens: auto;
+        hyphens: auto;
+    }
+
+    /* Additional text handling for mobile */
+    @media (max-width: 768px) {
+        .description-text {
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            white-space: normal;
+        }
     }
 
     /* Cart actions */
     .cart-actions {
-        margin-top: 2rem;
+        margin-top: auto;
+        padding-top: 1rem;
     }
 
     .cart-controls {
@@ -363,30 +399,90 @@
 
     /* Responsive Design */
     @media (max-width: 768px) {
+        .product-details-container {
+            padding: 0.5rem;
+        }
+        
         .product-card-details {
             grid-template-columns: 1fr;
             gap: 0;
-            margin: 1rem;
+            margin: 0;
+            border-radius: var(--border-radius);
+            min-height: 0;
         }
 
         .product-image-area {
             padding: 1rem;
+            min-height: 200px;
         }
 
         .product-image-area img {
-            max-height: 300px;
+            max-height: 200px;
         }
 
         .product-details {
-            padding: 1.5rem;
+            padding: 1rem;
+            gap: 1rem;
+            min-width: 0;
+        }
+
+        .product-header {
+            padding-bottom: 0.75rem;
         }
 
         .product-name {
-            font-size: 1.75rem;
+            font-size: 1.25rem;
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
         }
 
         .product-price {
-            font-size: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .product-meta {
+            padding: 0.75rem 0;
+        }
+
+        .meta-item {
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-label {
+            min-width: 60px;
+            font-size: 0.8rem;
+        }
+
+        .meta-value {
+            word-break: break-word;
+        }
+
+        .product-description {
+            padding: 0.75rem 0;
+            width: 100%;
+            overflow: visible;
+        }
+
+        .description-title {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+
+        .description-text {
+            font-size: 0.8rem;
+            line-height: 1.4;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            white-space: normal;
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .cart-actions {
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
         }
 
         .cart-controls {
@@ -398,10 +494,60 @@
         .btn {
             width: 100%;
             justify-content: center;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
         }
 
         .quantity-input {
             width: 100%;
+        }
+
+        .stock-message {
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .add-to-cart-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .add-to-cart-form label {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .product-details-container {
+            padding: 0.25rem;
+        }
+
+        .product-details {
+            padding: 0.75rem;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+        }
+
+        .product-price {
+            font-size: 1rem;
+        }
+
+        .meta-item {
+            font-size: 0.8rem;
+        }
+
+        .description-text {
+            font-size: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .description-title {
+            font-size: 0.9rem;
         }
     }
     </style>
@@ -544,8 +690,11 @@
             {% endif %}
         </div>
         <div class="product-details">
-            <h1 class="product-name">{{ product.name }}</h1>
-            <div class="product-price">${{ product.price }}</div>
+            <div class="product-header">
+                <h1 class="product-name">{{ product.name }}</h1>
+                <div class="product-price">${{ product.price }}</div>
+            </div>
+            
             <div class="product-meta">
                 <div class="meta-item">
                     <span class="meta-label">Category:</span>
@@ -568,12 +717,14 @@
                     </span>
                 </div>
             </div>
+            
             {% if product.description %}
                 <div class="product-description">
-                    <h3>Description</h3>
-                    <p>{{ product.description }}</p>
+                    <h3 class="description-title">Description</h3>
+                    <p class="description-text">{{ product.description }}</p>
                 </div>
             {% endif %}
+            
             <div class="cart-actions">
                 <div class="cart-controls">
                     {% if user.is_authenticated %}
